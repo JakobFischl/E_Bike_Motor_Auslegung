@@ -1,4 +1,6 @@
-class BatteryPack:
+from battery_base import BatteryBase
+
+class BatteryPack(BatteryBase):
     """
     Simple model of a battery pack as a single cell.
     The battery is modeled as an ideal voltage source (open circuit voltage) in series with an internal resistance.
