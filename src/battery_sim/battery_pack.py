@@ -23,7 +23,9 @@ class BatteryPack:
     def apply_current(self, current: float, duration: float) -> None:
         """Modify the SoC based on the applied current & duration"""
         
-        self.soc = self.soc - (current * duration) / self.capacity_nom_As
+        delta_soc = (current * duration) / self.capacity_nom_As
+        
+        self.soc = max(0.0, min(1.0, self.soc - delta_soc))
 
         
     def is_empty(self) -> bool:
