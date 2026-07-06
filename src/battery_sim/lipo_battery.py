@@ -5,16 +5,16 @@ from battery_pack import BatteryPack
 class LiPoBatteryPack(BatteryPack):
 
     cells_in_series = 10
-    Vmin = 3.2
-    Vmax = 4.2
-    internal_resistance_mOhm = 8
+    Vmin_per_cell = 3.2
+    Vmax_per_cell = 4.2
+    internal_resistance_mOhm_per_cell = 8
 
     def __init__(self, capacity_nom_Ah = 10, initial_soc = 1):
         super().__init__(capacity_nom_Ah, initial_soc)
 
-        self.Vmin = self.Vmin * self.cells_in_series
-        self.Vmax = self.Vmax * self.cells_in_series
-        self.R_int = self.internal_resistance_mOhm * self.cells_in_series / 1000
+        self.Vmin = self.Vmin_per_cell * self.cells_in_series
+        self.Vmax = self.Vmax_per_cell * self.cells_in_series
+        self.R_int = self.internal_resistance_mOhm_per_cell * self.cells_in_series / 1000
         
     def voltage(self, current = 0.0):
         soc = np.array([0.00, 0.04, 0.09, 0.13, 0.17, 0.21, 0.26, 0.30, 0.40, 0.52, 0.64, 0.76, 0.88, 1.00])
