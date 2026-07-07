@@ -10,7 +10,7 @@ class NMCBatteryPack(BatteryPack):
     internal_resistance_mOhm_per_cell = 7
 
     def __init__(self, capacity_nom_Ah = 10, initial_soc = 1):
-        super().__init__(capacity_nom_Ah, initial_soc)
+        super().__init__(capacity_nom_Ah, initial_soc=initial_soc)
 
         self.Vmin = self.Vmin_per_cell * self.cells_in_series
         self.Vmax = self.Vmax_per_cell * self.cells_in_series
