@@ -4,7 +4,8 @@ from plotting_utils import (
     plot_current_profile,
     plot_voltage_profile,
     plot_voltage_and_current_profile,
-    plot_soc_profile
+    plot_soc_profile,
+    plot_power_profile
 )
 
 
@@ -17,11 +18,13 @@ class BatterySimulator:
         self.truncated_duration_profile = []
         self.truncated_current_profile = []
         self.soc_profile = []
+        self.power_profile = []
 
     def simulate(self, current_profile: list[float], duration_profile: list[float]) -> None:
         
         self.voltage_profile = [self.battery_pack.voltage()]
-        self.soc_profile.append(self.battery_pack.soc)
+        self.soc_profile = [self.battery_pack.soc]
+        self.power_profile = []
 
         for i, (current, duration) in enumerate(zip(current_profile, duration_profile)):
             
@@ -32,11 +35,14 @@ class BatterySimulator:
                 break
                 
             elif self.battery_pack.is_full() and current < 0:
-                print("Battery is full: energy must be dissipated!")
                 v = self.battery_pack.voltage()
                 self.voltage_profile.append(v)
+                power = self.battery_pack.power(current)
+                self.power_profile.append(power)
                 self.truncated_duration_profile = duration_profile
                 self.truncated_current_profile = current_profile
+                self.soc_profile.append(self.battery_pack.soc)
+                print(f"Battery is full: {power:.2f} W must be dissipated!")
             else:
                 soc = self.battery_pack.apply_current(current, duration) 
                 self.soc_profile.append(soc)
@@ -44,10 +50,12 @@ class BatterySimulator:
                 self.voltage_profile.append(v)
                 self.truncated_duration_profile = duration_profile
                 self.truncated_current_profile = current_profile
+                power = self.battery_pack.power(current)
+                self.power_profile.append(power)
 
 
 if __name__ == "__main__":
-    load_current = [3.0, 11.0, 4.0, -1.5, 1.0]
+    load_current = [-1.5, 3.0, 11.0, 4.0, 1.0]
     load_durations = [300.0, 240.0, 90.0, 150.0, 120.0]
 
     battery = BatteryPack(capacity_nom_Ah=10, initial_soc=1, Vmin=32.0, Vmax=42.0)
@@ -57,8 +65,9 @@ if __name__ == "__main__":
     print(battery)
 
     plot_current_profile(current_profile=bat_sim.truncated_current_profile, duration_profile=bat_sim.truncated_duration_profile)
-    plot_soc_profile(soc_profile=bat_sim.soc_profile, duration_profile=load_durations)
+    plot_soc_profile(soc_profile=bat_sim.soc_profile, duration_profile=bat_sim.truncated_duration_profile)
     plot_voltage_profile(voltage_profile=bat_sim.voltage_profile, duration_profile=bat_sim.truncated_duration_profile)
     plot_voltage_and_current_profile(bat_sim.voltage_profile, bat_sim.truncated_current_profile, bat_sim.truncated_duration_profile)
+    plot_power_profile(power_profile=bat_sim.power_profile, duration_profile=bat_sim.truncated_duration_profile)
 
     input("Press Enter to continue...")

@@ -51,6 +51,13 @@ class BatteryPack(BatteryBase):
     def __str__(self):
         return f"BatteryPack(SoC={self.soc * 100:.1f}%, V={self.voltage():.2f} V)"
 
+    def power(self, current: float = 0.0) -> float:
+        """Return the current power draw from the battery at the given current flow and SoC."""
+        power_out = self.voltage(current) * current
+        return power_out
+
+
+
 
 if __name__ == "__main__":
 
@@ -64,3 +71,4 @@ if __name__ == "__main__":
     print(battery)
     battery.apply_current(current=-5.0, duration=150.0)
     print(battery)
+    print(f"{battery.power(current = 5.0):.2f} W")
