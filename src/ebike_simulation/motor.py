@@ -1,7 +1,7 @@
 class Motor:
-    def __init__(self, efficiency: float):
-        self.efficiency = efficiency
+    def __init__(self, K_m: float):
+        self.K_m = K_m
 
-    def get_current_draw(self, power: float, voltage: float) -> float:
-        current = power / (voltage * self.efficiency)
+    def get_current_draw(self, torque: float) -> float:
+        current = torque / self.K_m
         return current
