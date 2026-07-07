@@ -1,4 +1,6 @@
 from battery_pack import BatteryPack
+from lipo_battery import LiPoBatteryPack
+from nmc_battery import NMCBatteryPack
 
 from plotting_utils import (
     plot_current_profile,
@@ -12,7 +14,7 @@ from plotting_utils import (
 class BatterySimulator:
     """Simple simulator for a battery pack. The simulator applies a current profile to the battery pack and records the voltage profile."""
 
-    def __init__(self, battery_pack: BatteryPack) -> None:
+    def __init__(self, battery_pack) -> None:
         self.battery_pack = battery_pack
         self.voltage_profile = []
         self.truncated_duration_profile = []
@@ -59,6 +61,34 @@ if __name__ == "__main__":
     load_durations = [300.0, 240.0, 90.0, 150.0, 120.0]
 
     battery = BatteryPack(capacity_nom_Ah=10, initial_soc=1, Vmin=32.0, Vmax=42.0)
+    print(battery)
+    bat_sim = BatterySimulator(battery)
+    bat_sim.simulate(load_current, load_durations)
+    print(battery)
+
+    plot_current_profile(current_profile=bat_sim.truncated_current_profile, duration_profile=bat_sim.truncated_duration_profile)
+    plot_soc_profile(soc_profile=bat_sim.soc_profile, duration_profile=bat_sim.truncated_duration_profile)
+    plot_voltage_profile(voltage_profile=bat_sim.voltage_profile, duration_profile=bat_sim.truncated_duration_profile)
+    plot_voltage_and_current_profile(bat_sim.voltage_profile, bat_sim.truncated_current_profile, bat_sim.truncated_duration_profile)
+    plot_power_profile(power_profile=bat_sim.power_profile, duration_profile=bat_sim.truncated_duration_profile)
+
+    input("Press Enter to continue...")
+
+    battery = LiPoBatteryPack(capacity_nom_Ah=10, initial_soc=1)
+    print(battery)
+    bat_sim = BatterySimulator(battery)
+    bat_sim.simulate(load_current, load_durations)
+    print(battery)
+
+    plot_current_profile(current_profile=bat_sim.truncated_current_profile, duration_profile=bat_sim.truncated_duration_profile)
+    plot_soc_profile(soc_profile=bat_sim.soc_profile, duration_profile=bat_sim.truncated_duration_profile)
+    plot_voltage_profile(voltage_profile=bat_sim.voltage_profile, duration_profile=bat_sim.truncated_duration_profile)
+    plot_voltage_and_current_profile(bat_sim.voltage_profile, bat_sim.truncated_current_profile, bat_sim.truncated_duration_profile)
+    plot_power_profile(power_profile=bat_sim.power_profile, duration_profile=bat_sim.truncated_duration_profile)
+
+    input("Press Enter to continue...")
+
+    battery = NMCBatteryPack(capacity_nom_Ah=10, initial_soc=1)
     print(battery)
     bat_sim = BatterySimulator(battery)
     bat_sim.simulate(load_current, load_durations)
