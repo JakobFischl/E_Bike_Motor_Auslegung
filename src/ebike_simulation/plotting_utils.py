@@ -1,5 +1,6 @@
 import logging
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Set up local logger
 logger = logging.getLogger(__name__)
@@ -130,4 +131,30 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     fig.show()
     
     logger.info("Combined voltage and current profile plot generated successfully.")
+    return fig
+
+
+def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
+    "Plots the State of Charge of time starting at t = 0s"
+    
+    t_plot, soc_plot = [], []
+
+    t_plot.append(0.0)
+    soc_plot.append(soc_profile[0])
+
+    t_total = 0.0
+    for soc, d in zip(soc_profile[1:], duration_profile):
+        t_total += d
+        t_plot += [t_total]
+        soc_plot += [soc]
+        
+    fig, ax = plt.subplots()
+    ax.plot(t_plot, soc_plot)
+    ax.set_xlabel("Time $t$ / s")
+    ax.set_ylabel("State of Charge $SoC$ / -")
+    ax.set_yticks(np.arange(0.0, 1.05, 0.1))
+    ax.set_xticks(range(0, int(t_total) + 1, 60))
+    ax.set_ylim(-0.05, 1.05)
+    ax.grid(True)
+    fig.show()
     return fig

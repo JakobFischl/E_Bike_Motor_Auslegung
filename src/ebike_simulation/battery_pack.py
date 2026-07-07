@@ -23,12 +23,12 @@ class BatteryPack(BatteryBase):
         self.Vmax = Vmax
 
     def apply_current(self, current: float, duration: float) -> None:
-        """Modify the SoC based on the applied current & duration"""
+        """Modify the SoC based on the applied current & duration and return it."""
         
         delta_soc = (current * duration) / self.capacity_nom_As
         
         self.soc = max(0.0, min(1.0, self.soc - delta_soc))
-
+        return self.soc
         
     def is_empty(self) -> bool:
         if self.soc <= 0.0 + 1e-9:
