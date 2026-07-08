@@ -7,6 +7,7 @@ class BatteryPack(BatteryBase):
     The open circuit voltage is a linear function of the state of charge (SoC).
     The SoC is updated based on the applied current and duration.
     """
+    name = "Standard battery pack"
 
     def __init__(
         self,
@@ -49,7 +50,7 @@ class BatteryPack(BatteryBase):
         return v_out
 
     def __str__(self):
-        return f"BatteryPack(SoC={self.soc * 100:.1f}%, V={self.voltage():.2f} V)"
+        return f"BatteryPack: {self.name}; SoC = {self.soc * 100:.1f}%"
 
     def power(self, current: float = 0.0) -> float:
         """Return the current power draw from the battery at the given current flow and SoC."""

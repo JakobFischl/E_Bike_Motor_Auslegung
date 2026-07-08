@@ -8,6 +8,7 @@ class LiPoBatteryPack(BatteryPack):
     Vmin_per_cell = 3.2
     Vmax_per_cell = 4.2
     internal_resistance_mOhm_per_cell = 8
+    name = "LiPo"
 
     def __init__(self, capacity_nom_Ah = 10, initial_soc = 1):
         super().__init__(capacity_nom_Ah, initial_soc=initial_soc)
