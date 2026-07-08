@@ -12,7 +12,8 @@ from plotting_utils import (
 
 
 class BatterySimulator:
-    """Simple simulator for a battery pack. The simulator applies a current profile to the battery pack and records the voltage profile."""
+    """Simple simulator for a battery pack. The simulator applies a current profile to the battery pack 
+    and records voltage profile, state of charge over time and a power profile."""
 
     def __init__(self, battery_pack) -> None:
         self.battery_pack = battery_pack
@@ -44,7 +45,7 @@ class BatterySimulator:
                 self.truncated_duration_profile = duration_profile
                 self.truncated_current_profile = current_profile
                 self.soc_profile.append(self.battery_pack.soc)
-                print(f"Battery is full: {power:.2f} W must be dissipated!")
+                # print(f"Battery is full: {power:.2f} W must be dissipated!") supposed to be logging later
             else:
                 soc = self.battery_pack.apply_current(current, duration) 
                 self.soc_profile.append(soc)
@@ -55,6 +56,58 @@ class BatterySimulator:
                 power = self.battery_pack.power(current)
                 self.power_profile.append(power)
 
+    def summary(self, current_profile: list[float], duration_profile: list[float], soc_reserve: float) -> tuple:
+        self.simulate(current_profile, duration_profile)
+        final_soc = self.soc_profile[-1]
+        min_soc = min(self.soc_profile)
+        if len(self.power_profile) == 0:
+            #print("Battery is empty at start.") supposed to be logging
+            max_power = 0.0
+        else:
+            max_power = max(self.power_profile)
+            #print(f"max power = {max_power:.2f} W")
+        total_energy = 0.0
+        for p, d in zip(self.power_profile, self.truncated_duration_profile):
+            if p < 0:
+                continue
+            else:
+                delta_energy = p * d
+                total_energy = total_energy + delta_energy
+        #print(f"Total energy usage = {total_energy:.2f} Ws")
+        total_discharge = 0.0
+        for i, d in zip(self.truncated_current_profile, self.truncated_duration_profile):
+            if i < 0:
+                continue
+            else:
+                delta_discharge = i * d
+                total_discharge = total_discharge + delta_discharge
+        #print(f"Total current discharge = {total_discharge:.2f} As")
+        if min_soc >= soc_reserve:
+            c_sufficient = True
+            #print(f"Battery capacity was sufficient. The lowest SoC was {min_soc:.2f}. The final SoC was {final_soc:.2f}.")
+        else:
+            c_sufficient = False
+            #print("Battery capacity was not sufficient.")
+
+        return final_soc, min_soc, max_power, total_energy, total_discharge, c_sufficient
+
+    def print_summary(self, current_profile: list[float], duration_profile: list[float], soc_reserve) -> None:
+        final_soc, min_soc, max_power, total_energy, total_discharge, c_sufficient = self.summary(current_profile, duration_profile, soc_reserve)
+        print(f"The final SoC was {final_soc * 100:.2f} %.")
+        print(f"The lowest SoC was {min_soc * 100:.2f} %.")
+        print(f"The peak power draw was {max_power:.2f} W")
+        print(f"Total energy usage was {total_energy / 3600:.2f} Wh")
+        print(f"Total current discharge was {total_discharge / 3600:.2f} Ah")
+        if c_sufficient == True:
+            print(f"The battery capacity was sufficient.")
+        else:
+            print(f"The battery capacity was not sufficient.")
+
+
+
+        
+
+
 
 if __name__ == "__main__":
     load_current = [-1.5, 3.0, 11.0, 4.0, 1.0]
@@ -63,6 +116,8 @@ if __name__ == "__main__":
     battery = BatteryPack(capacity_nom_Ah=10, initial_soc=1, Vmin=32.0, Vmax=42.0)
     print(battery)
     bat_sim = BatterySimulator(battery)
+    bat_sim.summary(load_current, load_durations, 0.05)
+    bat_sim.print_summary(load_current, load_durations, 0.05)
     bat_sim.simulate(load_current, load_durations)
     print(battery)
 
@@ -77,6 +132,7 @@ if __name__ == "__main__":
     battery = LiPoBatteryPack(capacity_nom_Ah=10, initial_soc=1)
     print(battery)
     bat_sim = BatterySimulator(battery)
+    bat_sim.summary(load_current, load_durations, 0.05)
     bat_sim.simulate(load_current, load_durations)
     print(battery)
 
@@ -91,6 +147,7 @@ if __name__ == "__main__":
     battery = NMCBatteryPack(capacity_nom_Ah=10, initial_soc=1)
     print(battery)
     bat_sim = BatterySimulator(battery)
+    bat_sim.summary(load_current, load_durations, 0.05)
     bat_sim.simulate(load_current, load_durations)
     print(battery)
 
