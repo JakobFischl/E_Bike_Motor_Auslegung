@@ -1,4 +1,5 @@
 from battery_base import BatteryBase
+from scipy.interpolate import PchipInterpolator
 
 class BatteryPack(BatteryBase):
     """
@@ -8,6 +9,8 @@ class BatteryPack(BatteryBase):
     The SoC is updated based on the applied current and duration.
     """
     name = "Standard battery pack"
+    soc_table = None
+    voc_table = None
 
     def __init__(
         self,
@@ -18,10 +21,12 @@ class BatteryPack(BatteryBase):
         Vmax: float = 42,
     ):
         self.capacity_nom_As = capacity_nom_Ah * 3600
-        self.internal_resistance_Ohm = internal_resistance_mOhm / 1000
+        self.R_int = internal_resistance_mOhm / 1000
         self.soc = max(0.0, min(1.0, initial_soc))
         self.Vmin = Vmin
         self.Vmax = Vmax
+        if self.soc_table is not None:
+            self.pchip = PchipInterpolator(self.soc_table, self.voc_table)
 
     def apply_current(self, current: float, duration: float) -> None:
         """Modify the SoC based on the applied current & duration and return it."""
@@ -45,8 +50,12 @@ class BatteryPack(BatteryBase):
 
     def voltage(self, current: float = 0.0) -> float:
         """Return the current voltage of the battery at the SoC and the given current flow"""
-        V_oc = self.Vmin + self.soc * (self.Vmax - self.Vmin)
-        v_out = V_oc - self.internal_resistance_Ohm * current
+        if self.soc_table is None:
+            open_circuit_voltage = self.Vmin + self.soc * (self.Vmax - self.Vmin)
+        else:
+            open_circuit_voltage = self.pchip(self.soc)
+
+        v_out = open_circuit_voltage - self.R_int * current
         return v_out
 
     def __str__(self):
