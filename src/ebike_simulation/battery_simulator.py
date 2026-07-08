@@ -39,22 +39,21 @@ class BatterySimulator:
                 
             elif self.battery_pack.is_full() and current < 0:
                 v = self.battery_pack.voltage()
-                self.voltage_profile.append(v)
-                power = self.battery_pack.power(current)
-                self.power_profile.append(power)
-                self.truncated_duration_profile = duration_profile
-                self.truncated_current_profile = current_profile
-                self.soc_profile.append(self.battery_pack.soc)
+                soc = self.battery_pack.soc
                 # print(f"Battery is full: {power:.2f} W must be dissipated!") supposed to be logging later
             else:
-                soc = self.battery_pack.apply_current(current, duration) 
-                self.soc_profile.append(soc)
                 v = self.battery_pack.voltage(current)
-                self.voltage_profile.append(v)
-                self.truncated_duration_profile = duration_profile
-                self.truncated_current_profile = current_profile
-                power = self.battery_pack.power(current)
-                self.power_profile.append(power)
+                soc = self.battery_pack.apply_current(current, duration)
+
+            self.voltage_profile.append(v)
+ 
+            self.soc_profile.append(soc)
+
+            power = self.battery_pack.power(current)
+            self.power_profile.append(power)
+        else:    
+            self.truncated_duration_profile = duration_profile
+            self.truncated_current_profile = current_profile
 
     def summary(self, current_profile: list[float], duration_profile: list[float], soc_reserve: float) -> tuple:
         self.simulate(current_profile, duration_profile)
