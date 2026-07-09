@@ -25,6 +25,7 @@ class BatterySimulator:
 
     def simulate(self, current_profile: list[float], duration_profile: list[float]) -> None:
         
+        BatteryPack.reset_soc(self.battery_pack)
         self.voltage_profile = [self.battery_pack.voltage()]
         self.soc_profile = [self.battery_pack.soc]
         self.power_profile = []

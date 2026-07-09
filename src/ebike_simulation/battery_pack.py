@@ -22,11 +22,16 @@ class BatteryPack(BatteryBase):
     ):
         self.capacity_nom_As = capacity_nom_Ah * 3600
         self.R_int = internal_resistance_mOhm / 1000
-        self.soc = max(0.0, min(1.0, initial_soc))
+        self.starting_soc = max(0.0, min(1.0, initial_soc))
+        self.soc = self.starting_soc
         self.Vmin = Vmin
         self.Vmax = Vmax
         if self.soc_table is not None:
             self.pchip = PchipInterpolator(self.soc_table, self.voc_table)
+
+    def reset_soc(self) -> float:
+        self.soc = self.starting_soc
+        return self.soc
 
     def apply_current(self, current: float, duration: float) -> None:
         """Modify the SoC based on the applied current & duration and return it."""
