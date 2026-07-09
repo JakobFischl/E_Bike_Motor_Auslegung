@@ -42,16 +42,10 @@ class BatteryPack(BatteryBase):
         return self.soc
         
     def is_empty(self) -> bool:
-        if self.soc <= 0.0 + 1e-9:
-            return True
-        else:
-            return False
+        return self.soc <= 0.0 + 1e-9
 
     def is_full(self) -> bool:
-        if self.soc >= 1.0 - 1e-9:
-            return True
-        else:
-            return False
+        return self.soc >= 1.0 - 1e-9
 
     def voltage(self, current: float = 0.0) -> float:
         """Return the current voltage of the battery at the SoC and the given current flow"""
