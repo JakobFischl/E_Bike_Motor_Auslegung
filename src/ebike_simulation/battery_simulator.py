@@ -99,7 +99,7 @@ class BatterySimulator:
         print(f"The peak power draw was {max_power:.2f} W")
         print(f"Total energy usage was {total_energy / 3600:.2f} Wh")
         print(f"Total current discharge was {total_discharge / 3600:.2f} Ah")
-        if c_sufficient == True:
+        if c_sufficient:
             print(f"The battery capacity was sufficient.")
         else:
             print(f"The battery capacity was not sufficient.")
