@@ -40,16 +40,17 @@ class BatterySimulator:
             elif self.battery_pack.is_full() and current < 0:
                 v = self.battery_pack.voltage()
                 soc = self.battery_pack.soc
+                power = self.battery_pack.power()
                 # print(f"Battery is full: {power:.2f} W must be dissipated!") supposed to be logging later
             else:
                 v = self.battery_pack.voltage(current)
                 soc = self.battery_pack.apply_current(current, duration)
+                power = self.battery_pack.power(current)
 
             self.voltage_profile.append(v)
  
             self.soc_profile.append(soc)
 
-            power = self.battery_pack.power(current)
             self.power_profile.append(power)
         else:    
             self.truncated_duration_profile = duration_profile
@@ -74,11 +75,11 @@ class BatterySimulator:
                 total_energy = total_energy + delta_energy
         #print(f"Total energy usage = {total_energy:.2f} Ws")
         total_discharge = 0.0
-        for i, d in zip(self.truncated_current_profile, self.truncated_duration_profile):
-            if i < 0:
+        for I, d in zip(self.truncated_current_profile, self.truncated_duration_profile):
+            if I < 0:
                 continue
             else:
-                delta_discharge = i * d
+                delta_discharge = I * d
                 total_discharge = total_discharge + delta_discharge
         #print(f"Total current discharge = {total_discharge:.2f} As")
         if min_soc >= soc_reserve:
