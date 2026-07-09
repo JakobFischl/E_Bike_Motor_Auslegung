@@ -16,7 +16,11 @@ def determine_capacity(battery_class: type[BatteryPack], current_profile: list[f
     trial_capacity_Ah_high = initial_test_capacity
     trial_capacity_Ah_low = trial_capacity_Ah_high / 2
     min_soc_high = get_min_soc(trial_capacity_Ah_high)
+    min_soc_low = get_min_soc(trial_capacity_Ah_low)
 
+    while min_soc_low > soc_reserve:
+        trial_capacity_Ah_low = trial_capacity_Ah_low / 2
+        min_soc_low = get_min_soc(trial_capacity_Ah_low)
 
     while min_soc_high < soc_reserve:
         trial_capacity_Ah_high = trial_capacity_Ah_high * 2
