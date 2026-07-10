@@ -33,7 +33,7 @@ class BatteryPack(BatteryBase):
         self.soc = self.starting_soc
         return self.soc
 
-    def apply_current(self, current: float, duration: float) -> None:
+    def apply_current(self, current: float = 0.0, duration: float = 0.0) -> float:
         """Modify the SoC based on the applied current & duration and return it."""
         
         delta_soc = (current * duration) / self.capacity_nom_As
