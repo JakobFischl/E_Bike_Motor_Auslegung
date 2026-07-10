@@ -1,6 +1,7 @@
 from battery_pack import BatteryPack
 from lipo_battery import LiPoBatteryPack
 from nmc_battery import NMCBatteryPack
+import math
 
 from plotting_utils import (
     plot_current_profile,
@@ -20,6 +21,11 @@ class SummaryResult(NamedTuple):
     total_discharge: float
     meets_soc_reserve: bool
 
+import logging
+
+# Set up local logger
+logger = logging.getLogger(__name__)
+
 
 class BatterySimulator:
     """Simple simulator for a battery pack. The simulator applies a current profile to the battery pack 
@@ -32,23 +38,41 @@ class BatterySimulator:
         self.truncated_current_profile = []
         self.soc_profile = []
         self.power_profile = []
+        self.has_run = False
 
     def simulate(self, current_profile: list[float], duration_profile: list[float]) -> None:
         
+        if not all(isinstance(x, (int,float)) and math.isfinite(x) for x in duration_profile):
+            raise ValueError("Duration profile does not only contain numeric finite values.")
+        elif not all(isinstance(x, (int,float)) and math.isfinite(x) for x in current_profile):
+            raise ValueError("Current profile does not only contain numeric finite values.")
+        elif len(current_profile) != len(duration_profile):
+            raise ValueError("Duration profile must have the same length as current profile.")
+        elif len(duration_profile) == 0:
+            raise ValueError("Duration and current profiles cannot be empty.")
+        elif any(x < 0 for x in duration_profile):
+            raise ValueError("There can be no negative duration intervals.")
+        elif any(x == 0 for x in duration_profile):
+            logger.warning("At least one duration between timestamps is zero seconds long.")
+
+
         self.battery_pack.reset_soc()
         self.voltage_profile = [self.battery_pack.voltage()]
         self.soc_profile = [self.battery_pack.soc]
         self.power_profile = []
 
+        total_duration = 0.0
+
         for current, duration in zip(current_profile, duration_profile):
             
+
             if self.battery_pack.is_empty():
-                print("Battery is empty: cannot discharge further!")
+                logger.info(f"{self.battery_pack.name} Battery with {self.battery_pack.capacity_nom_As / 3600:.2f} Ah is empty after {total_duration / 60:.1f} minutes. Cannot discharge further.")
                 break
-                
+
             elif self.battery_pack.is_full() and current < 0:
                 effective_current = 0.0
-                # print(f"Battery is full: {power:.2f} W must be dissipated!") supposed to be logging later
+                logger.debug(f"Battery is full: Rejecting {current:.2f} A of regen.")
             else:
                 effective_current = current
 
@@ -59,9 +83,12 @@ class BatterySimulator:
             power = self.battery_pack.power(effective_current)
             self.power_profile.append(power)
         
+            total_duration += duration
+
         n = len(self.power_profile)
         self.truncated_duration_profile = duration_profile[:n]
         self.truncated_current_profile = current_profile[:n]
+        self.has_run = True
 
     def summary(
             self,
@@ -69,6 +96,10 @@ class BatterySimulator:
             duration_profile: list[float],
             soc_reserve: float
     ) -> SummaryResult:
+        
+        if soc_reserve < 0 or soc_reserve > 1.0:
+            raise ValueError("The state of charge reserve has to be between 0 and 1.")
+
         self.simulate(current_profile, duration_profile)
         final_soc = self.soc_profile[-1]
         min_soc = min(self.soc_profile)
@@ -86,6 +117,8 @@ class BatterySimulator:
         )
 
         meets_soc_reserve = min_soc >= soc_reserve
+        if not meets_soc_reserve:
+            logger.debug("Battery capacity is not sufficient.")
 
         return SummaryResult(
             final_soc=final_soc,
@@ -114,7 +147,14 @@ class BatterySimulator:
             print("The battery capacity was not sufficient.")
 
 
-    def plot_profiles(self):
+    def plot_profiles(self) -> None:
+
+        if len(self.truncated_current_profile) == 0:
+            if not self.has_run:
+                raise RuntimeError("Lists are empty. Run simulation first.")
+            logger.warning("Initial state of charge was 0%.")
+
+        
         plot_current_profile(
             current_profile=self.truncated_current_profile,
             duration_profile=self.truncated_duration_profile
