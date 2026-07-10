@@ -27,7 +27,7 @@ def plot_current_profile(current_profile: list[float], duration_profile: list[fl
     ax.grid(True)
     fig.show()
 
-    logger.info("Current profile plot generated successfully.")
+    logger.debug("Current profile plot generated successfully.")
     return fig
 
 def plot_power_profile(power_profile: list[float], duration_profile: list[float]):
@@ -52,7 +52,7 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
     ax.grid(True)
     fig.show()
     
-    logger.info("Power profile plot generated successfully.")
+    logger.debug("Power profile plot generated successfully.")
     return fig
 
 
@@ -78,7 +78,7 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
     ax.grid(True)
     fig.show()
     
-    logger.info("Voltage profile plot generated successfully.")
+    logger.debug("Voltage profile plot generated successfully.")
     return fig
 
 def plot_voltage_and_current_profile(voltage_profile: list[float], current_profile: list[float], duration_profile: list[float]):
@@ -109,7 +109,7 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     fig.legend(loc="upper right", bbox_to_anchor=(0.85, 0.85))
     fig.show()
     
-    logger.info("Combined voltage and current profile plot generated successfully.")
+    logger.debug("Combined voltage and current profile plot generated successfully.")
     return fig
 
 
@@ -136,5 +136,5 @@ def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
     ax.grid(True)
     fig.show()
 
-    logger.info("SoC profile plot generated successfully.")
+    logger.debug("SoC profile plot generated successfully.")
     return fig
