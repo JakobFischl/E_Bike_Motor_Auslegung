@@ -104,6 +104,12 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
 def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
     "Plots the State of Charge of time starting at t = 0s"
     
+    if len(soc_profile) - 1 != len(duration_profile):
+        logger.error("Plot failed: SoC profile length must be exactly duration + 1 (for t=0).")
+        raise ValueError("SoC profile must be longer by 1 than duration profile.")
+    
+    logger.debug("Generating SoC profile plot...")
+    
     edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
         
     fig, ax = plt.subplots()
