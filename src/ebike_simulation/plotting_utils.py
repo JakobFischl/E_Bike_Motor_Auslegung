@@ -10,7 +10,6 @@ def plot_current_profile(current_profile: list[float], duration_profile: list[fl
     
     # Error Handling & Logging
     if len(current_profile) != len(duration_profile):
-        logger.error(f"Plot failed: current_profile (len {len(current_profile)}) and duration_profile (len {len(duration_profile)}) mismatch.")
         raise ValueError("Current and duration profiles must have the same length.")
     elif len(duration_profile) == 0:
         raise ValueError("The duration profile must have at least one value.")
@@ -36,7 +35,6 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
 
     # Error Handling & Logging
     if len(power_profile) != len(duration_profile):
-        logger.error("Plot failed: Power and duration profiles dimension mismatch.")
         raise ValueError("Power and duration profiles must have the same length.")
     elif len(duration_profile) == 0:
         raise ValueError("The duration profile must have at least one value.")
@@ -63,7 +61,6 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
 
     # Error Handling & Logging
     if len(voltage_profile) - 1 != len(duration_profile):
-        logger.error("Plot failed: Voltage profile length must be exactly duration + 1 (for t=0).")
         raise ValueError("Voltage profile must be longer by 1 than duration profile.")
     elif len(duration_profile) == 0:
         raise ValueError("The duration profile must have at least one value.")
@@ -89,7 +86,6 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
 
     # Error Handling & Logging
     if not (len(voltage_profile) - 1 == len(current_profile) == len(duration_profile)):
-        logger.error("Plot failed: Dimension mismatch among combined voltage, current, and duration profiles.")
         raise ValueError("Current and duration profiles must have the same length, and voltage profile must be longer by 1.")
     elif len(duration_profile) == 0:
         raise ValueError("The duration profile must have at least one value.")
@@ -121,7 +117,6 @@ def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
     """Plots the State of Charge over time starting at t = 0s"""
     
     if len(soc_profile) - 1 != len(duration_profile):
-        logger.error("Plot failed: SoC profile length must be exactly duration + 1 (for t=0).")
         raise ValueError("SoC profile must be longer by 1 than duration profile.")
     elif len(duration_profile) == 0:
         raise ValueError("The duration profile must have at least one value.")
