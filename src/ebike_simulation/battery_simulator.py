@@ -2,6 +2,7 @@ from battery_pack import BatteryPack
 from lipo_battery import LiPoBatteryPack
 from nmc_battery import NMCBatteryPack
 import math
+import numpy as np
 
 from plotting_utils import (
     plot_current_profile,
@@ -40,19 +41,27 @@ class BatterySimulator:
         self.power_profile = []
         self.has_run = False
 
-    def simulate(self, current_profile: list[float], duration_profile: list[float]) -> None:
+    def simulate(self, current_profile: np.ndarray, duration_profile: np.ndarray) -> None:
         
-        if not all(isinstance(x, (int,float)) and math.isfinite(x) for x in duration_profile):
+        if not isinstance(duration_profile, np.ndarray):
+            raise TypeError("Duration profile has to be a numpy array.")
+        if not isinstance(current_profile, np.ndarray):
+            raise TypeError("Current profile has to be a numpy array.")
+        elif duration_profile.ndim != 1:
+            raise ValueError("Expected duration profile must have one dimension.")
+        elif current_profile.ndim !=1:
+            raise ValueError("Expected current profile must have one dimension.")
+        elif not np.isfinite(duration_profile).all():
             raise ValueError("Duration profile does not only contain numeric finite values.")
-        elif not all(isinstance(x, (int,float)) and math.isfinite(x) for x in current_profile):
+        elif not np.isfinite(current_profile).all():
             raise ValueError("Current profile does not only contain numeric finite values.")
         elif len(current_profile) != len(duration_profile):
             raise ValueError("Duration profile must have the same length as current profile.")
         elif len(duration_profile) == 0:
             raise ValueError("Duration and current profiles cannot be empty.")
-        elif any(x < 0 for x in duration_profile):
+        elif np.less(duration_profile, 0).any():
             raise ValueError("There can be no negative duration intervals.")
-        elif any(x == 0 for x in duration_profile):
+        elif np.equal(duration_profile, 0).any():
             logger.warning("At least one duration between timestamps is zero seconds long.")
 
 
@@ -92,8 +101,8 @@ class BatterySimulator:
 
     def summary(
             self,
-            current_profile: list[float],
-            duration_profile: list[float],
+            current_profile: np.ndarray,
+            duration_profile: np.ndarray,
             soc_reserve: float
     ) -> SummaryResult:
         
@@ -102,8 +111,8 @@ class BatterySimulator:
 
         self.simulate(current_profile, duration_profile)
         final_soc = self.soc_profile[-1]
-        min_soc = min(self.soc_profile)
-        max_power = max(self.power_profile, default=0.0)
+        min_soc = np.min(self.soc_profile)
+        max_power = np.max(self.power_profile, initial=0.0)
         
         total_energy = sum(
             power * duration
@@ -131,8 +140,8 @@ class BatterySimulator:
 
     def print_summary(
             self,
-            current_profile: list[float],
-            duration_profile: list[float],
+            current_profile: np.ndarray,
+            duration_profile: np.ndarray,
             soc_reserve: float
     ) -> None:
         result = self.summary(current_profile, duration_profile, soc_reserve)
@@ -153,6 +162,7 @@ class BatterySimulator:
             if not self.has_run:
                 raise RuntimeError("Lists are empty. Run simulation first.")
             logger.warning("Initial state of charge was 0%.")
+            return
 
         
         plot_current_profile(
@@ -179,8 +189,9 @@ class BatterySimulator:
 
 
 if __name__ == "__main__":
-    load_current = [-1.5, 3.0, 11.0, 4.0, 1.0]
-    load_durations = [300.0, 240.0, 90.0, 150.0, 120.0]
+    load_current = np.array([-1.5, 3.0, 11.0, 4.0, 1.0])
+    load_durations = np.array([300.0, 240.0, 90.0, 150.0, 120.0])
+    print(type(load_current))
     batteries = [
         BatteryPack(capacity_nom_Ah=10, initial_soc=1, Vmin=32.0, Vmax=42.0),
         LiPoBatteryPack(capacity_nom_Ah=10, initial_soc=1),
