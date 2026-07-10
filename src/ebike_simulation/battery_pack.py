@@ -33,7 +33,7 @@ class BatteryPack(BatteryBase):
         self.R_int = internal_resistance_mOhm / 1000
         
         if initial_soc < 0 or initial_soc > 1.0:
-            raise ValueError("The initial state of charge has to be between 0% and 100%.")
+            raise ValueError("The initial state of charge has to be between 0 and 1.")
         self.starting_soc = initial_soc
         self.soc = self.starting_soc
 
@@ -64,7 +64,7 @@ class BatteryPack(BatteryBase):
             logger.info(f"The state of charge would reach {unclamped_soc}, clamped to 1.0.")
             self.soc = 1.0
         elif unclamped_soc < 0:
-            logger.warning(f"The state of charge would reach {unclamped_soc}, clamped to 0.0.)")
+            logger.warning(f"The state of charge would reach {unclamped_soc}, clamped to 0.0.")
             self.soc = 0.0
         else:
             self.soc = unclamped_soc
