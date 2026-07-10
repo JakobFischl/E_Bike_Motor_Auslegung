@@ -11,10 +11,6 @@ def plot_current_profile(current_profile: list[float], duration_profile: list[fl
     # Error Handling & Logging
     if len(current_profile) != len(duration_profile):
         raise ValueError("Current and duration profiles must have the same length.")
-    elif len(duration_profile) == 0:
-        raise ValueError("The duration profile must have at least one value.")
-    elif any(x == 0 for x in duration_profile):
-        logger.warning("At least one duration between timestamps is zero seconds long.")
     
     logger.debug("Generating current profile plot...")
     
@@ -36,10 +32,6 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
     # Error Handling & Logging
     if len(power_profile) != len(duration_profile):
         raise ValueError("Power and duration profiles must have the same length.")
-    elif len(duration_profile) == 0:
-        raise ValueError("The duration profile must have at least one value.")
-    elif any(x == 0 for x in duration_profile):
-        logger.warning("At least one duration between timestamps is zero seconds long.")
     
     logger.debug("Generating power profile plot...")
 
@@ -62,10 +54,6 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
     # Error Handling & Logging
     if len(voltage_profile) - 1 != len(duration_profile):
         raise ValueError("Voltage profile must be longer by 1 than duration profile.")
-    elif len(duration_profile) == 0:
-        raise ValueError("The duration profile must have at least one value.")
-    elif any(x == 0 for x in duration_profile):
-        logger.warning("At least one duration between timestamps is zero seconds long.")
     
     logger.debug("Generating voltage profile plot...")
 
@@ -87,10 +75,6 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     # Error Handling & Logging
     if not (len(voltage_profile) - 1 == len(current_profile) == len(duration_profile)):
         raise ValueError("Current and duration profiles must have the same length, and voltage profile must be longer by 1.")
-    elif len(duration_profile) == 0:
-        raise ValueError("The duration profile must have at least one value.")
-    elif any(x == 0 for x in duration_profile):
-        logger.warning("At least one duration between timestamps is zero seconds long.")
     
     logger.debug("Generating combined voltage and current profile plot...")
 
@@ -118,10 +102,6 @@ def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
     
     if len(soc_profile) - 1 != len(duration_profile):
         raise ValueError("SoC profile must be longer by 1 than duration profile.")
-    elif len(duration_profile) == 0:
-        raise ValueError("The duration profile must have at least one value.")
-    elif any(x == 0 for x in duration_profile):
-        logger.warning("At least one duration between timestamps is zero seconds long.")
 
     logger.debug("Generating SoC profile plot...")
     
