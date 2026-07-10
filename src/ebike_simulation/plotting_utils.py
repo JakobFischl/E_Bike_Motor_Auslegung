@@ -12,7 +12,11 @@ def plot_current_profile(current_profile: list[float], duration_profile: list[fl
     if len(current_profile) != len(duration_profile):
         logger.error(f"Plot failed: current_profile (len {len(current_profile)}) and duration_profile (len {len(duration_profile)}) mismatch.")
         raise ValueError("Current and duration profiles must have the same length.")
-
+    elif len(duration_profile) == 0:
+        raise ValueError("The duration profile must have at least one value.")
+    elif any(x == 0 for x in duration_profile):
+        logger.warning("At least one duration between timestamps is zero seconds long.")
+    
     logger.debug("Generating current profile plot...")
     
     edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
@@ -34,7 +38,11 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
     if len(power_profile) != len(duration_profile):
         logger.error("Plot failed: Power and duration profiles dimension mismatch.")
         raise ValueError("Power and duration profiles must have the same length.")
-
+    elif len(duration_profile) == 0:
+        raise ValueError("The duration profile must have at least one value.")
+    elif any(x == 0 for x in duration_profile):
+        logger.warning("At least one duration between timestamps is zero seconds long.")
+    
     logger.debug("Generating power profile plot...")
 
     edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
@@ -57,7 +65,11 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
     if len(voltage_profile) - 1 != len(duration_profile):
         logger.error("Plot failed: Voltage profile length must be exactly duration + 1 (for t=0).")
         raise ValueError("Voltage profile must be longer by 1 than duration profile.")
-
+    elif len(duration_profile) == 0:
+        raise ValueError("The duration profile must have at least one value.")
+    elif any(x == 0 for x in duration_profile):
+        logger.warning("At least one duration between timestamps is zero seconds long.")
+    
     logger.debug("Generating voltage profile plot...")
 
     edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
@@ -79,7 +91,11 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     if not (len(voltage_profile) - 1 == len(current_profile) == len(duration_profile)):
         logger.error("Plot failed: Dimension mismatch among combined voltage, current, and duration profiles.")
         raise ValueError("Current and duration profiles must have the same length, and voltage profile must be longer by 1.")
-
+    elif len(duration_profile) == 0:
+        raise ValueError("The duration profile must have at least one value.")
+    elif any(x == 0 for x in duration_profile):
+        logger.warning("At least one duration between timestamps is zero seconds long.")
+    
     logger.debug("Generating combined voltage and current profile plot...")
 
     edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
@@ -87,8 +103,8 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     fig, axV = plt.subplots(figsize=(9, 4.5))
     axI = axV.twinx()
 
-    axV.stairs(voltage_profile[1:], edges, baseline=None, linewidth=1.5, zorder=2.5, color="b", label="Voltage U / V")
-    axI.stairs(current_profile, edges, baseline=None, linewidth=1.5, zorder=2.5, color="r", label="Current I / A")
+    axV.stairs(voltage_profile[1:], edges, baseline=None, linewidth=1.5, zorder=2.5, color="b", linestyle="-", label="Voltage U / V")
+    axI.stairs(current_profile, edges, baseline=None, linewidth=1.5, zorder=2.5, color="r", linestyle="--", label="Current I / A")
     axV.set_xlabel("Time $t$ / s")
     axV.set_ylabel("Voltage $U$ / V", color="b")
     axI.set_ylabel("Current $I$ / A", color="r")
@@ -102,12 +118,16 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
 
 
 def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
-    "Plots the State of Charge of time starting at t = 0s"
+    """Plots the State of Charge over time starting at t = 0s"""
     
     if len(soc_profile) - 1 != len(duration_profile):
         logger.error("Plot failed: SoC profile length must be exactly duration + 1 (for t=0).")
         raise ValueError("SoC profile must be longer by 1 than duration profile.")
-    
+    elif len(duration_profile) == 0:
+        raise ValueError("The duration profile must have at least one value.")
+    elif any(x == 0 for x in duration_profile):
+        logger.warning("At least one duration between timestamps is zero seconds long.")
+
     logger.debug("Generating SoC profile plot...")
     
     edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
@@ -120,4 +140,6 @@ def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
     ax.set_ylim(-0.05, 1.05)
     ax.grid(True)
     fig.show()
+
+    logger.info("SoC profile plot generated successfully.")
     return fig
