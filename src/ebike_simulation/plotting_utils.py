@@ -15,19 +15,12 @@ def plot_current_profile(current_profile: list[float], duration_profile: list[fl
 
     logger.debug("Generating current profile plot...")
     
-    t_plot, I_plot = [], []
-    t_total = 0.0
-    for I, d in zip(current_profile, duration_profile):
-        t_plot += [t_total, t_total + d]
-        I_plot += [I, I]
-        t_total += d
+    edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
 
     fig, ax = plt.subplots()
-    ax.plot(t_plot, I_plot)
+    ax.stairs(current_profile, edges, linewidth=1.5, zorder=2.5)
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("Current $I$ / A")
-    ax.set_yticks(range(-2, 12, 1))
-    ax.set_xticks(range(0, int(t_total) + 1, 60))
     ax.grid(True)
     fig.show()
 
@@ -44,18 +37,12 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
 
     logger.debug("Generating power profile plot...")
 
-    t_plot, P_plot = [], []
-    t_total = 0.0
-    for P, d in zip(power_profile, duration_profile):
-        t_plot += [t_total, t_total + d]
-        P_plot += [P, P]
-        t_total += d
+    edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
 
     fig, ax = plt.subplots()
-    ax.plot(t_plot, P_plot)
+    ax.stairs(power_profile, edges, linewidth=1.5, zorder=2.5)
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("Power $P$ / W")
-    ax.set_xticks(range(0, int(t_total) + 1, 60))
     ax.grid(True)
     fig.show()
     
@@ -73,19 +60,10 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
 
     logger.debug("Generating voltage profile plot...")
 
-    t_plot, U_plot = [], []
-
-    t_plot.append(0.0)
-    U_plot.append(voltage_profile[0])
-
-    t_total = 0.0
-    for U, d in zip(voltage_profile[1:], duration_profile):
-        t_plot += [t_total, t_total + d]
-        U_plot += [U, U]
-        t_total += d
+    edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
 
     fig, ax = plt.subplots()
-    ax.plot(t_plot, U_plot)
+    ax.stairs(voltage_profile[1:], edges, linewidth=1.5, zorder=2.5, baseline=None)
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("Voltage $U$ / V")
     ax.grid(True)
@@ -104,24 +82,13 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
 
     logger.debug("Generating combined voltage and current profile plot...")
 
-    t_plot, U_plot, I_plot = [], [], []
-
-    t_plot.append(0.0)
-    U_plot.append(voltage_profile[0])
-
-    t_total = 0.0
-    for U, I, d in zip(voltage_profile[1:], current_profile, duration_profile):
-        t_plot += [t_total, t_total + d]
-        U_plot += [U, U]
-        I_plot += [I, I]
-
-        t_total += d
+    edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
 
     fig, axV = plt.subplots(figsize=(9, 4.5))
     axI = axV.twinx()
 
-    axV.plot(t_plot[0:], U_plot, "b-", label="Voltage U / V")
-    axI.plot(t_plot[1:], I_plot, "r--", label="Current I / A")
+    axV.stairs(voltage_profile[1:], edges, baseline=None, linewidth=1.5, zorder=2.5, color="b", label="Voltage U / V")
+    axI.stairs(current_profile, edges, baseline=None, linewidth=1.5, zorder=2.5, color="r", label="Current I / A")
     axV.set_xlabel("Time $t$ / s")
     axV.set_ylabel("Voltage $U$ / V", color="b")
     axI.set_ylabel("Current $I$ / A", color="r")
@@ -137,23 +104,13 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
 def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
     "Plots the State of Charge of time starting at t = 0s"
     
-    t_plot, soc_plot = [], []
-
-    t_plot.append(0.0)
-    soc_plot.append(soc_profile[0])
-
-    t_total = 0.0
-    for soc, d in zip(soc_profile[1:], duration_profile):
-        t_total += d
-        t_plot += [t_total]
-        soc_plot += [soc]
+    edges = np.concatenate(([0.0], np.cumsum(duration_profile)))
         
     fig, ax = plt.subplots()
-    ax.plot(t_plot, soc_plot)
+    ax.plot(edges, soc_profile)
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("State of Charge $SoC$ / -")
     ax.set_yticks(np.arange(0.0, 1.05, 0.1))
-    ax.set_xticks(range(0, int(t_total) + 1, 60))
     ax.set_ylim(-0.05, 1.05)
     ax.grid(True)
     fig.show()
