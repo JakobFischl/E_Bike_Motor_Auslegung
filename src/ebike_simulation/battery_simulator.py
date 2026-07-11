@@ -15,6 +15,15 @@ from plotting_utils import (
 from typing import NamedTuple
 
 class SummaryResult(NamedTuple):
+    """
+    Summary of the results of a simulation run.
+    final_soc: state of charge at the end of the profile.
+    min_soc: lowest state of charge reached during the run.
+    max_power: peak output power in watts.
+    total_energy: discharged energy in joules (only positive power contributes).
+    total_discharge: discharged charge in ampere-seconds (only positive current contributes).
+    meets_soc_reserve: True if min_soc stayed at or above the requested state of charge reserve.
+    """
     final_soc: float
     min_soc: float
     max_power: float
@@ -33,6 +42,7 @@ class BatterySimulator:
     and records voltage profile, state of charge over time and a power profile."""
 
     def __init__(self, battery_pack) -> None:
+        """Wrap a battery pack and initialise empty result profiles."""
         self.battery_pack = battery_pack
         self.voltage_profile = []
         self.truncated_duration_profile = []
@@ -42,7 +52,13 @@ class BatterySimulator:
         self.has_run = False
 
     def simulate(self, current_profile: np.ndarray, duration_profile: np.ndarray) -> None:
-        
+        """
+        Apply a current and duration profile to the battery pack and record the resulting profiles.
+        current_profile: current per interval in amperes (positive = discharge, negative = charge).
+        duration_profile: length of each interval in seconds, same length as current_profile.
+        Stops early once the battery is empty.
+        """
+
         if not isinstance(duration_profile, np.ndarray):
             raise TypeError("Duration profile has to be a numpy array.")
         if not isinstance(current_profile, np.ndarray):
@@ -65,6 +81,7 @@ class BatterySimulator:
             logger.warning("At least one duration between timestamps is zero seconds long.")
 
 
+        # Start from a defined state and include the first value (initial SoC and initial voltage). Power profile starts empty.
         self.battery_pack.reset_soc()
         self.voltage_profile = [self.battery_pack.voltage()]
         self.soc_profile = [self.battery_pack.soc]
@@ -73,12 +90,12 @@ class BatterySimulator:
         total_duration = 0.0
 
         for current, duration in zip(current_profile, duration_profile):
-            
 
             if self.battery_pack.is_empty():
                 logger.info(f"{self.battery_pack.name} Battery with {self.battery_pack.capacity_nom_As / 3600:.2f} Ah is empty after {total_duration / 60:.1f} minutes. Cannot discharge further.")
                 break
 
+            # A full battery cannot charge (negative current) further, so drop the effectively flowing current to zero.
             elif self.battery_pack.is_full() and current < 0:
                 effective_current = 0.0
                 logger.debug(f"Battery is full: Rejecting {current:.2f} A of regen.")
@@ -94,6 +111,7 @@ class BatterySimulator:
         
             total_duration += duration
 
+        # If the loop broke early, trim the input profiles to the steps actually simulated.
         n = len(self.power_profile)
         self.truncated_duration_profile = duration_profile[:n]
         self.truncated_current_profile = current_profile[:n]
@@ -105,7 +123,11 @@ class BatterySimulator:
             duration_profile: np.ndarray,
             soc_reserve: float
     ) -> SummaryResult:
-        
+        """
+        Run the simulation and return its results into a SummaryResult.
+        soc_reserve: minimum acceptable state of charge between zero and one used for the reserve check.
+        """
+
         if soc_reserve < 0 or soc_reserve > 1.0:
             raise ValueError("The state of charge reserve has to be between 0 and 1.")
 
@@ -113,7 +135,8 @@ class BatterySimulator:
         final_soc = self.soc_profile[-1]
         min_soc = np.min(self.soc_profile)
         max_power = np.max(self.power_profile, initial=0.0)
-        
+
+        # Sum only positive power and current so charging intervals are excluded.
         total_energy = sum(
             power * duration
             for power, duration in zip(self.power_profile, self.truncated_duration_profile)
@@ -144,6 +167,7 @@ class BatterySimulator:
             duration_profile: np.ndarray,
             soc_reserve: float
     ) -> None:
+        """Run the simulation and print a summary (SoC in %, energy in Wh, charge in Ah)."""
         result = self.summary(current_profile, duration_profile, soc_reserve)
         print(f"The final SoC was {result.final_soc * 100:.2f} %.")
         print(f"The lowest SoC was {result.min_soc * 100:.2f} %.")
@@ -157,14 +181,15 @@ class BatterySimulator:
 
 
     def plot_profiles(self) -> None:
+        """Plot the recorded current, SoC, voltage and power profiles of the last run."""
 
+        # Empty profiles mean either the simulation never ran or it started with empty lists.
         if len(self.truncated_current_profile) == 0:
             if not self.has_run:
                 raise RuntimeError("Lists are empty. Run simulation first.")
             logger.warning("Initial state of charge was 0%.")
             return
 
-        
         plot_current_profile(
             current_profile=self.truncated_current_profile,
             duration_profile=self.truncated_duration_profile
