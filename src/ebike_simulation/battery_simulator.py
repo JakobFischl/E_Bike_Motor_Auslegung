@@ -47,21 +47,21 @@ class BatterySimulator:
             raise TypeError("Duration profile has to be a numpy array.")
         if not isinstance(current_profile, np.ndarray):
             raise TypeError("Current profile has to be a numpy array.")
-        elif duration_profile.ndim != 1:
+        if duration_profile.ndim != 1:
             raise ValueError("Expected duration profile must have one dimension.")
-        elif current_profile.ndim !=1:
+        if current_profile.ndim !=1:
             raise ValueError("Expected current profile must have one dimension.")
-        elif not np.isfinite(duration_profile).all():
+        if not np.isfinite(duration_profile).all():
             raise ValueError("Duration profile does not only contain numeric finite values.")
-        elif not np.isfinite(current_profile).all():
+        if not np.isfinite(current_profile).all():
             raise ValueError("Current profile does not only contain numeric finite values.")
-        elif len(current_profile) != len(duration_profile):
+        if len(current_profile) != len(duration_profile):
             raise ValueError("Duration profile must have the same length as current profile.")
-        elif len(duration_profile) == 0:
+        if len(duration_profile) == 0:
             raise ValueError("Duration and current profiles cannot be empty.")
-        elif np.less(duration_profile, 0).any():
+        if np.less(duration_profile, 0).any():
             raise ValueError("There can be no negative duration intervals.")
-        elif np.equal(duration_profile, 0).any():
+        if np.equal(duration_profile, 0).any():
             logger.warning("At least one duration between timestamps is zero seconds long.")
 
 
