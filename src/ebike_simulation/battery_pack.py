@@ -7,8 +7,10 @@ logger = logging.getLogger(__name__)
 
 class BatteryPack(BatteryBase):
     """
-    Simple model of a battery pack as a single cell.
+    Simple model of a battery pack treated as one equivalent cell.
     The battery is modeled as an ideal voltage source (open circuit voltage) in series with an internal resistance.
+    For the base BatteryPack, the open circuit voltage is linear, but subclasses can override this linearity to
+    enable PCHIP interpolation.
     The SoC is updated based on the applied current and duration.
     """
     name = "Standard battery pack"
@@ -17,13 +19,20 @@ class BatteryPack(BatteryBase):
 
     def __init__(
         self,
-        capacity_nom_Ah: float = 10,
+        capacity_nom_Ah: float = 10.0,
         internal_resistance_mOhm: float = 80.0,
         initial_soc: float = 1.0,
         Vmin: float = 30,
         Vmax: float = 42,
     ):
-        
+        """
+        Construct a battery pack and validate the parameters.
+        capacity_nom_Ah: nominal capacity in ampere-hours.
+        internal_resistance_mOhm: internal resistance of the pack in milliohms.
+        initial_soc: initial state of charge between zero and one.
+        Vmin, Vmax: open circuit voltage at empty and full SoC.
+        """
+
         if capacity_nom_Ah <= 0:
             raise ValueError("Capacity must be positive.")
         self.capacity_nom_As = capacity_nom_Ah * 3600
@@ -42,9 +51,11 @@ class BatteryPack(BatteryBase):
         self.Vmin = Vmin
         self.Vmax = Vmax
         self.pchip = None
+        # Build the SoC/VOC interpolator only if a subclass provided lookup tables.
         if self.soc_table is not None and self.voc_table is not None:
             if len(self.soc_table) != len(self.voc_table):
                 raise ValueError("The open circuit voltage must be defined by the same amount of values as the soc_table.")
+            # PCHIP requires strictly increasing sample points on the x-axis (SoC table).
             elif not all(x < y for x, y in zip(self.soc_table, self.soc_table[1:])):
                 raise ValueError("The values in soc_table must be strictly monotonically increasing.")
             self.pchip = PchipInterpolator(self.soc_table, self.voc_table)
@@ -52,11 +63,15 @@ class BatteryPack(BatteryBase):
         logger.debug(f"Constructed {self.name} with {capacity_nom_Ah} Ah and {initial_soc * 100:.2f} initial state of charge.")
 
     def reset_soc(self) -> float:
+        """Reset the SoC to the initial value and return it."""
         self.soc = self.starting_soc
         return self.soc
 
     def apply_current(self, current: float = 0.0, duration: float = 0.0) -> float:
-        """Modify the SoC based on the applied current & duration and return it."""
+        """
+        Modify the SoC based on the applied current & duration and return it.
+        Clamp SoC between zero and one.
+        """
 
         delta_soc = (current * duration) / self.capacity_nom_As
         unclamped_soc = self.soc - delta_soc
@@ -72,13 +87,15 @@ class BatteryPack(BatteryBase):
         return self.soc
         
     def is_empty(self) -> bool:
+        """Return True if the battery is empty (small tolerance for float comparison)."""
         return self.soc <= 0.0 + 1e-9
 
     def is_full(self) -> bool:
+        """Return True if the battery is full (small tolerance for float comparison)."""
         return self.soc >= 1.0 - 1e-9
 
     def voltage(self, current: float = 0.0) -> float:
-        """Return the current voltage of the battery at the SoC and the given current flow"""
+        """Return the present voltage of the battery at the SoC and the given current flow."""
         if self.pchip is None:
             open_circuit_voltage = self.Vmin + self.soc * (self.Vmax - self.Vmin)
         else:
@@ -91,7 +108,7 @@ class BatteryPack(BatteryBase):
         return f"Battery: {self.name}; SoC = {self.soc * 100:.1f}%"
 
     def power(self, current: float = 0.0) -> float:
-        """Return the current power draw from the battery at the given current flow and SoC."""
+        """Return the present output power (voltage times current) at the given current flow and SoC."""
         power_out = self.voltage(current) * current
         return power_out
 
