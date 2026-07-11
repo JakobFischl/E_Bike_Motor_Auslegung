@@ -5,7 +5,7 @@ import numpy as np
 # Set up local logger
 logger = logging.getLogger(__name__)
 
-def plot_current_profile(current_profile: list[float], duration_profile: list[float]):
+def plot_current_profile(current_profile: np.ndarray, duration_profile: np.ndarray):
     """Plots the current over time profile starting from t=0s."""
     
     # Error Handling & Logging
@@ -26,7 +26,7 @@ def plot_current_profile(current_profile: list[float], duration_profile: list[fl
     logger.debug("Current profile plot generated successfully.")
     return fig
 
-def plot_power_profile(power_profile: list[float], duration_profile: list[float]):
+def plot_power_profile(power_profile: list[float], duration_profile: np.ndarray):
     """Plots the power over time profile starting from t=0s."""
 
     # Error Handling & Logging
@@ -48,7 +48,7 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
     return fig
 
 
-def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[float]):
+def plot_voltage_profile(voltage_profile: list[float], duration_profile: np.ndarray):
     """Plots the voltage over time profile starting from t=0s."""
 
     # Error Handling & Logging
@@ -69,7 +69,7 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
     logger.debug("Voltage profile plot generated successfully.")
     return fig
 
-def plot_voltage_and_current_profile(voltage_profile: list[float], current_profile: list[float], duration_profile: list[float]):
+def plot_voltage_and_current_profile(voltage_profile: list[float], current_profile: np.ndarray, duration_profile: np.ndarray):
     """Plots the voltage and current over time profiles starting from t=0s."""
 
     # Error Handling & Logging
@@ -97,7 +97,7 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     return fig
 
 
-def plot_soc_profile(soc_profile: list[float], duration_profile: list[float]):
+def plot_soc_profile(soc_profile: list[float], duration_profile: np.ndarray):
     """Plots the State of Charge over time starting at t = 0s"""
     
     if len(soc_profile) - 1 != len(duration_profile):
