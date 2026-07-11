@@ -2,7 +2,12 @@ import numpy as np
 from battery_pack import BatteryPack
 
 class LiPoBatteryPack(BatteryPack):
-
+    """
+    Simple model of a 10-cell-series lithium polymer battery pack.
+    Defines minimum/maximum voltage and internal resistance per cell,
+    derives pack values for them and passes them on to BatteryPack.
+    """
+    
     cells_in_series = 10
     Vmin_per_cell = 3.2
     Vmax_per_cell = 4.2
@@ -11,7 +16,7 @@ class LiPoBatteryPack(BatteryPack):
     soc_table = np.array([0.00, 0.04, 0.09, 0.13, 0.17, 0.21, 0.26, 0.30, 0.40, 0.52, 0.64, 0.76, 0.88, 1.00])
     voc_table = np.array([32.00, 35.87, 36.85, 37.56, 37.87, 38.28, 38.81, 39.05, 39.55, 40.27, 40.70, 41.16, 41.65, 42.00])
 
-    def __init__(self, capacity_nom_Ah = 10, initial_soc = 1):
+    def __init__(self, capacity_nom_Ah: float = 10.0, initial_soc: float = 1.0):
         
         Vmin = self.Vmin_per_cell * self.cells_in_series
         Vmax = self.Vmax_per_cell * self.cells_in_series
