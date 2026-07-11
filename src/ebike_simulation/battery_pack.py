@@ -64,7 +64,7 @@ class BatteryPack(BatteryBase):
             logger.info(f"The state of charge would reach {unclamped_soc * 100:.2f}%, clamped to 100%.")
             self.soc = 1.0
         elif unclamped_soc < 0:
-            logger.warning(f"The state of charge would reach {unclamped_soc * 100:.2f}%, clamped to 0%.")
+            logger.info(f"The state of charge would reach {unclamped_soc * 100:.2f}%, clamped to 0%.")
             self.soc = 0.0
         else:
             self.soc = unclamped_soc
