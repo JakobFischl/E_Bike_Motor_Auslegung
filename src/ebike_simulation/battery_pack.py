@@ -49,7 +49,7 @@ class BatteryPack(BatteryBase):
                 raise ValueError("The values in soc_table must be strictly monotonically increasing.")
             self.pchip = PchipInterpolator(self.soc_table, self.voc_table)
 
-        logger.debug(f"Constructed {self.name} with {capacity_nom_Ah} Ah and {initial_soc} initial state of charge.")
+        logger.debug(f"Constructed {self.name} with {capacity_nom_Ah} Ah and {initial_soc * 100:.2f} initial state of charge.")
 
     def reset_soc(self) -> float:
         self.soc = self.starting_soc
@@ -61,10 +61,10 @@ class BatteryPack(BatteryBase):
         delta_soc = (current * duration) / self.capacity_nom_As
         unclamped_soc = self.soc - delta_soc
         if unclamped_soc > 1:
-            logger.info(f"The state of charge would reach {unclamped_soc}, clamped to 1.0.")
+            logger.info(f"The state of charge would reach {unclamped_soc * 100:.2f}%, clamped to 100%.")
             self.soc = 1.0
         elif unclamped_soc < 0:
-            logger.warning(f"The state of charge would reach {unclamped_soc}, clamped to 0.0.")
+            logger.warning(f"The state of charge would reach {unclamped_soc * 100:.2f}%, clamped to 0%.")
             self.soc = 0.0
         else:
             self.soc = unclamped_soc
