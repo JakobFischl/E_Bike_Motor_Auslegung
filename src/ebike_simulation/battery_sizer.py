@@ -1,9 +1,10 @@
 from battery_simulator import BatterySimulator
 from battery_pack import BatteryPack
 import math
+import numpy as np
 
 
-def determine_capacity(battery_class: type[BatteryPack], current_profile: list[float], duration_profile: list[float], soc_reserve: float, initial_test_capacity: float = 1.0, initial_soc: float = 1.0) -> float:
+def determine_capacity(battery_class: type[BatteryPack], current_profile: np.ndarray, duration_profile: np.ndarray, soc_reserve: float, initial_test_capacity: float = 0.01, initial_soc: float = 1.0) -> float:
 
     def get_min_soc(capacity):
         battery = battery_class(initial_soc=initial_soc, capacity_nom_Ah=capacity)
@@ -43,8 +44,8 @@ def determine_capacity(battery_class: type[BatteryPack], current_profile: list[f
 
 if __name__ == "__main__":
     
-    load_current = [15.5, 12.0, 13.0, 14.0, 10.0]
-    load_durations = [800.0, 240.0, 90.0, 150.0, 120.0]
+    load_current = np.array([15.5, 12.0, 13.0, 14.0, 10.0])
+    load_durations = np.array([800.0, 240.0, 90.0, 150.0, 120.0])
 
     sufficient_capacity = determine_capacity(BatteryPack, current_profile=load_current, duration_profile=load_durations, soc_reserve=0.05)
     print(f"Battery has to have at least {sufficient_capacity} Ah.")
