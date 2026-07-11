@@ -38,6 +38,7 @@ def determine_capacity(battery_class: type[BatteryPack], current_profile: np.nda
         min_soc_low = get_min_soc(trial_capacity_Ah_low)
 
     while min_soc_high < soc_reserve:
+        trial_capacity_Ah_low = trial_capacity_Ah_high
         trial_capacity_Ah_high = trial_capacity_Ah_high * 2
         min_soc_high = get_min_soc(trial_capacity_Ah_high)
     
