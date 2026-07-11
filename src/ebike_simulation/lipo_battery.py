@@ -13,11 +13,13 @@ class LiPoBatteryPack(BatteryPack):
     Vmax_per_cell = 4.2
     internal_resistance_mOhm_per_cell = 8
     name = "LiPo"
+    # Measured open circuit voltage at specific SoC's, interpolated with PCHIP in BatteryPack.
     soc_table = np.array([0.00, 0.04, 0.09, 0.13, 0.17, 0.21, 0.26, 0.30, 0.40, 0.52, 0.64, 0.76, 0.88, 1.00])
     voc_table = np.array([32.00, 35.87, 36.85, 37.56, 37.87, 38.28, 38.81, 39.05, 39.55, 40.27, 40.70, 41.16, 41.65, 42.00])
 
     def __init__(self, capacity_nom_Ah: float = 10.0, initial_soc: float = 1.0):
-        
+        """Derive voltage and resistance from the per-cell values and hand them to BatteryPack."""
+
         Vmin = self.Vmin_per_cell * self.cells_in_series
         Vmax = self.Vmax_per_cell * self.cells_in_series
         R_int_mOhm = self.internal_resistance_mOhm_per_cell * self.cells_in_series
