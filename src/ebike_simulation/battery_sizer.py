@@ -25,7 +25,8 @@ def determine_capacity(
     soc_reserve: minimum acceptable state of charge between zero and one.
     initial_test_capacity: starting capacity in Ah for the bracketing search.
     initial_soc: state of charge each trial battery starts from between zero and one.
-
+    capacity_resolution_Ah: capacity step (Ah) the search resolves to and rounds the result up to.
+    max_iterations: safety cap on iteration steps before aborting.
     Returns the required capacity in Ah, rounded up to the next capacity_resolution_Ah step.
     """
 
@@ -33,6 +34,10 @@ def determine_capacity(
        raise ValueError("No positive current in the profile, therefore no battery is needed to complete the course.")
     if soc_reserve >= 1.0 or soc_reserve <= 0:
         raise ValueError("SoC Reserve has to be larger than 0 and less than 1.")
+    if capacity_resolution_Ah <= 0:
+        raise ValueError("The capacity resolution has to be positive.")
+    if max_iterations < 1:
+        raise ValueError("The maximum number of iterations has to be at least 1.")
     if not issubclass(battery_class, BatteryPack):
         raise TypeError("The battery pack has to have the class type 'BatteryPack'")
 
@@ -70,17 +75,22 @@ def determine_capacity(
 
     iteration_count = 0
 
-    # Narrow the window until it is smaller than 0.5 Ah.
+    # Narrow the window until it is smaller than the capacity resolution.
     while True:
         iteration_count += 1
+        # Safety net: abort if the search fails to converge (e.g. a degenerate profile).
+        if iteration_count > max_iterations:
+            raise RuntimeError(f"Capacity search did not converge within {max_iterations} iterations.")
         mid = (low + high) / 2
 
         min_soc = get_min_soc(mid)
 
         if min_soc >= soc_reserve:
-            # Once a sufficient capacity is found within a narrow window, round up to the next 0.1 Ah.
-            if (high - low) <= 0.5:
-                final_capacity = math.ceil(mid*10) / 10
+            # Once a sufficient capacity is found within a narrow window, round up to the next resolution step.
+            if (high - low) <= capacity_resolution_Ah:
+                # round() before ceil() strips float dust so a value already on a step is not bumped up one.
+                steps = math.ceil(round(mid / capacity_resolution_Ah, 9))
+                final_capacity = round(steps * capacity_resolution_Ah, 9)
                 logger.debug(f"Battery sufficient with {final_capacity} Ah. Found after {iteration_count} iterations.")
                 return final_capacity
             else:
