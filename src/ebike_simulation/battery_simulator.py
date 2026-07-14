@@ -2,6 +2,7 @@ from ebike_simulation.battery_pack import BatteryPack
 from ebike_simulation.lipo_battery import LiPoBatteryPack
 from ebike_simulation.nmc_battery import NMCBatteryPack
 import numpy as np
+import matplotlib.pyplot as plt
 
 from ebike_simulation.plotting_utils import (
     plot_current_profile,
@@ -230,4 +231,5 @@ if __name__ == "__main__":
         bat_sim = BatterySimulator(battery)
         bat_sim.print_summary(load_current, load_durations, 0.05)
         bat_sim.plot_profiles()
+        plt.show(block=False)
         input("Press Enter to continue...")
