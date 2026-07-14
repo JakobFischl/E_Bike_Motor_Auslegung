@@ -26,7 +26,6 @@ def plot_current_profile(
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("Current $I$ / A")
     ax.grid(True)
-    fig.show()
 
     logger.debug("Current profile plot generated successfully.")
     return fig
@@ -52,7 +51,6 @@ def plot_power_profile(
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("Power $P$ / W")
     ax.grid(True)
-    fig.show()
     
     logger.debug("Power profile plot generated successfully.")
     return fig
@@ -79,7 +77,6 @@ def plot_voltage_profile(
     ax.set_xlabel("Time $t$ / s")
     ax.set_ylabel("Voltage $U$ / V")
     ax.grid(True)
-    fig.show()
     
     logger.debug("Voltage profile plot generated successfully.")
     return fig
@@ -119,7 +116,6 @@ def plot_voltage_and_current_profile(
     axV.grid(True)
     
     fig.legend(loc="upper right", bbox_to_anchor=(0.85, 0.85))
-    fig.show()
     
     logger.debug("Combined voltage and current profile plot generated successfully.")
     return fig
@@ -148,7 +144,6 @@ def plot_soc_profile(
     ax.set_yticks(np.arange(0.0, 1.05, 0.1))
     ax.set_ylim(-0.05, 1.05)
     ax.grid(True)
-    fig.show()
 
     logger.debug("SoC profile plot generated successfully.")
     return fig

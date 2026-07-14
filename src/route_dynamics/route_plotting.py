@@ -21,7 +21,6 @@ def plot_hoehenprofil(distanz_km: np.ndarray, elevation: np.ndarray):
     
     ax.fill_between(distanz_km, elevation, np.min(elevation) - 10, color='forestgreen', alpha=0.2)
     
-    fig.show()
     logger.debug("Höhenprofil generiert.")
     return fig
 
@@ -38,7 +37,6 @@ def plot_geschwindigkeit(zeit: np.ndarray, geschwindigkeit_kmh: np.ndarray):
     ax.set_ylabel('Geschwindigkeit (km/h)')
     ax.grid(True, linestyle='--', alpha=0.7)
     
-    fig.show()
     logger.debug("Geschwindigkeits Plot generiert.")
     return fig
 
@@ -55,6 +53,5 @@ def plot_motorleistung(zeit: np.ndarray, leistung_w: np.ndarray):
     ax.set_ylabel('Leistung (W)')
     ax.grid(True, linestyle='--', alpha=0.7)
     
-    fig.show()
     logger.debug("Leistungs Plot generiert.")
     return fig
