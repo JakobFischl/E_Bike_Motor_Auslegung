@@ -22,10 +22,10 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 
-    dateipfad = "simulation_data/final_project_input_data.csv"
+    file_path = "simulation_data/final_project_input_data.csv"
     soc_reserve = 0.05
 
-    route = RouteAnalysis(dateipfad)
+    route = RouteAnalysis(file_path)
     route.geschwindigkeit()
     route.beschleunigung()
     route.steigung()
@@ -34,12 +34,19 @@ if __name__ == "__main__":
     dynamics.kraefte()
     duration_profile, current_profile = dynamics.motor_werte()
 
-    daten = dynamics.daten
+    data = dynamics.daten
 
     metrics = compute_ride_metrics(
-        daten['delta_s_meter'].to_numpy(),
-        daten['delta_t_sekunden'].to_numpy(),
-        daten['ele'].to_numpy(),
-        daten['leistung_W'].to_numpy()
+        data['delta_s_meter'].to_numpy(),
+        data['delta_t_sekunden'].to_numpy(),
+        data['ele'].to_numpy(),
+        data['leistung_W'].to_numpy()
     )
     print_ride_metrics(metrics)
+
+    distance_km = np.cumsum(data['delta_s_meter'].to_numpy()) / 1000
+    time_min = np.cumsum(data['delta_t_sekunden'].to_numpy()) / 60
+
+    plot_hoehenprofil(distance_km, data['ele'].to_numpy())
+    plot_geschwindigkeit(time_min, data['geschwindigkeit_km_h'].to_numpy())
+    plot_motorleistung(time_min, data['leistung_W'].to_numpy())
