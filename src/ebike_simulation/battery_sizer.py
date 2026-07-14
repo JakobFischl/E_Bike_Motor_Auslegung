@@ -1,5 +1,5 @@
-from battery_simulator import BatterySimulator
-from battery_pack import BatteryPack
+from ebike_simulation.battery_simulator import BatterySimulator
+from ebike_simulation.battery_pack import BatteryPack
 import math
 import numpy as np
 import logging

@@ -1,4 +1,4 @@
-from battery_base import BatteryBase
+from ebike_simulation.battery_base import BatteryBase
 from scipy.interpolate import PchipInterpolator
 import logging
 

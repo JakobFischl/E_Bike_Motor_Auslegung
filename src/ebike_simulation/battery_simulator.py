@@ -1,7 +1,6 @@
-from battery_pack import BatteryPack
-from lipo_battery import LiPoBatteryPack
-from nmc_battery import NMCBatteryPack
-import math
+from ebike_simulation.battery_pack import BatteryPack
+from ebike_simulation.lipo_battery import LiPoBatteryPack
+from ebike_simulation.nmc_battery import NMCBatteryPack
 import numpy as np
 
 from plotting_utils import (

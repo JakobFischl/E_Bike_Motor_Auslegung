@@ -1,5 +1,5 @@
 import numpy as np
-from battery_pack import BatteryPack
+from ebike_simulation.battery_pack import BatteryPack
 
 class LiPoBatteryPack(BatteryPack):
     """
