@@ -106,10 +106,9 @@ class RouteAnalysis:
             raise
 
 
-meine_fahrt = RouteAnalysis('simulation_data/final_project_input_data.csv')
-
-meine_fahrt.geschwindigkeit()
-meine_fahrt.beschleunigung()
-meine_fahrt.steigung()
-
-print(meine_fahrt.daten[['time', 'geschwindigkeit_km_h', 'beschleunigung_m_s2', 'steigung_prozent']].head())
+if __name__ == "__main__":
+    meine_fahrt = RouteAnalysis('simulation_data/final_project_input_data.csv')
+    meine_fahrt.geschwindigkeit()
+    meine_fahrt.beschleunigung()
+    meine_fahrt.steigung()
+    print(meine_fahrt.daten[['time', 'geschwindigkeit_km_h', 'beschleunigung_m_s2', 'steigung_prozent']].head())
