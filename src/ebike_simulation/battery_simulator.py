@@ -3,7 +3,7 @@ from ebike_simulation.lipo_battery import LiPoBatteryPack
 from ebike_simulation.nmc_battery import NMCBatteryPack
 import numpy as np
 
-from plotting_utils import (
+from ebike_simulation.plotting_utils import (
     plot_current_profile,
     plot_voltage_profile,
     plot_voltage_and_current_profile,
