@@ -15,6 +15,7 @@ class RouteAnalysis:
             logger.info(f"Daten von '{dateipfad}'laden.")
             self.daten = pd.read_csv(dateipfad, sep=';')
             self.daten['time'] = pd.to_datetime(self.daten['time'])
+            self.dichte_punkte_zusammenfassen()
             logger.info("Daten geladen")
 
         except FileNotFoundError:
@@ -25,9 +26,27 @@ class RouteAnalysis:
             logger.error(f"Fehler beim Laden der Daten: {e}")
             raise
 
+    def dichte_punkte_zusammenfassen(self, min_dt_sekunden: float = 1.0):
+        """
+        Fasst GPS-Punkte zusammen, die weniger als min_dt_sekunden auseinanderliegen.
+        Sehr kurze Zeitintervalle lassen Geschwindigkeit und Beschleunigung durch
+        GPS-Rauschen explodieren (Division durch ein winziges delta_t), daher wird
+        pro dichtem Cluster nur der erste Punkt behalten.
+        """
+        logger.info(f"Fasse Punkte mit weniger als {min_dt_sekunden}s Abstand zusammen.")
+        zeiten = self.daten['time'].to_numpy()
+        behalten = [0]
+        letzte_zeit = zeiten[0]
+        for i in range(1, len(zeiten)):
+            if (zeiten[i] - letzte_zeit) / np.timedelta64(1, 's') >= min_dt_sekunden:
+                behalten.append(i)
+                letzte_zeit = zeiten[i]
+        self.daten = self.daten.iloc[behalten].reset_index(drop=True)
+        logger.debug(f"{len(behalten)} von {len(zeiten)} Punkten behalten.")
+
     def geschwindigkeit(self):
         """
-        Berechnet die zurückgelegte Strecke mitttels der Haversine-Formel 
+        Berechnet die zurückgelegte Strecke mittels der Haversine-Formel
         sowie Geschwindigkeit in m/s und km/h.
         """
         logger.info("Berechnung der Geschwindigkeit.")
@@ -56,6 +75,12 @@ class RouteAnalysis:
         
             # Geschwindigkeit
             self.daten['geschwindigkeit_m_s'] = self.daten['delta_s_meter'] / self.daten['delta_t_sekunden']
+
+            # Gleitender Median gegen einzelne GPS-Ausreisser, bevor daraus die
+            # Beschleunigung abgeleitet wird. Die Strecke (delta_s_meter) bleibt unberuehrt.
+            self.daten['geschwindigkeit_m_s'] = (
+                self.daten['geschwindigkeit_m_s'].rolling(5, center=True, min_periods=1).median()
+            )
 
             # Umrechnung in km/h
             self.daten['geschwindigkeit_km_h'] = self.daten['geschwindigkeit_m_s'] * 3.6
