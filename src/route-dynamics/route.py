@@ -59,7 +59,10 @@ class RouteAnalysis:
 
             # Umrechnung in km/h
             self.daten['geschwindigkeit_km_h'] = self.daten['geschwindigkeit_m_s'] * 3.6
-        
+            self.daten['delta_t_sekunden'] = self.daten['delta_t_sekunden'].fillna(0)
+            self.daten['delta_s_meter'] = self.daten['delta_s_meter'].fillna(0)
+            self.daten['geschwindigkeit_m_s'] = self.daten['geschwindigkeit_m_s'].fillna(0)
+            self.daten['geschwindigkeit_km_h'] = self.daten['geschwindigkeit_km_h'].fillna(0)
             logger.debug("Geschwindigkeit im Datensatz.")
             
         except KeyError as e:
@@ -74,6 +77,7 @@ class RouteAnalysis:
         try:
             delta_v = self.daten['geschwindigkeit_m_s'].diff()
             self.daten['beschleunigung_m_s2'] = delta_v / self.daten['delta_t_sekunden']
+            self.daten['beschleunigung_m_s2'] = self.daten['beschleunigung_m_s2'].fillna(0)
             logger.debug("Beschleunigung erfolgreich berechnet.")
         except KeyError:
             logger.error("Fehler: Geschwindigkeit vor Beschleunigung berechnen!")
@@ -93,6 +97,8 @@ class RouteAnalysis:
         
             self.daten['steigung_prozent'] = (delta_h / strecke) * 100
             self.daten['steigung_winkel_rad'] = np.arctan(delta_h / strecke)
+            self.daten['steigung_prozent'] = self.daten['steigung_prozent'].fillna(0)
+            self.daten['steigung_winkel_rad'] = self.daten['steigung_winkel_rad'].fillna(0)
             logger.debug("Steigung berechnet")
             
         except KeyError as e:
