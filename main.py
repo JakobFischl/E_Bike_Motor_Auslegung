@@ -1,11 +1,11 @@
 from route_dynamics.route import RouteAnalysis
 from route_dynamics.dynamics import EBikeDynamics
+from route_dynamics.ride_metrics import compute_ride_metrics, print_ride_metrics
 from route_dynamics.route_plotting import (
     plot_hoehenprofil,
     plot_geschwindigkeit,
     plot_motorleistung
 )
-from route_dynamics.ride_metrics import compute_ride_metrics, print_ride_metrics
 from ebike_simulation.battery_simulator import BatterySimulator
 from ebike_simulation.battery_sizer import determine_capacity
 from ebike_simulation.lipo_battery import LiPoBatteryPack
@@ -35,3 +35,11 @@ if __name__ == "__main__":
     duration_profile, current_profile = dynamics.motor_werte()
 
     daten = dynamics.daten
+
+    metrics = compute_ride_metrics(
+        daten['delta_s_meter'].to_numpy(),
+        daten['delta_t_sekunden'].to_numpy(),
+        daten['ele'].to_numpy(),
+        daten['leistung_W'].to_numpy()
+    )
+    print_ride_metrics(metrics)
