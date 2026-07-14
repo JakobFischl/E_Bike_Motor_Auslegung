@@ -64,16 +64,23 @@ class EBikeDynamics:
     def motor_werte(self):
         """
         Berechnet das benötigte Drehmoment, den Motorstrom in Ampere und die Leistung in Watt.
+
+        Returns:
+            tuple[np.ndarray, np.ndarray]: duration_profile (Zeitschritte in Sekunden)
+            und current_profile (Motorstrom in Ampere).
         """
         logger.info("Berechnung von Drehmoment, Strom und Leistung.")
         try:
-        
+
             self.daten['drehmoment_Nm'] = self.daten['F_gesamt'] * self.radius_rad
             self.daten['motorstrom_A'] = self.motor.get_current_draw(self.daten['drehmoment_Nm'])
             self.daten['leistung_W'] = self.daten['F_gesamt'] * self.daten['geschwindigkeit_m_s']
-        
+
+            duration_profile = self.daten['delta_t_sekunden'].to_numpy()
+            current_profile = self.daten['motorstrom_A'].to_numpy()
+
             logger.debug("Motorwerte berechnet.")
-            return self.daten
+            return duration_profile, current_profile
         
         except KeyError as e:
             logger.error(f"Fehler: Kräfte vor Motorwerte berechnen Fehlende Spalte: {e}")
