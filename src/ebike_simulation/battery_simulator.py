@@ -49,6 +49,7 @@ class BatterySimulator:
         self.truncated_current_profile = []
         self.soc_profile = []
         self.power_profile = []
+        self.effective_current_profile = []
         self.has_run = False
 
     def simulate(self, current_profile: np.ndarray, duration_profile: np.ndarray) -> None:
@@ -86,6 +87,7 @@ class BatterySimulator:
         self.voltage_profile = [self.battery_pack.voltage()]
         self.soc_profile = [self.battery_pack.soc]
         self.power_profile = []
+        self.effective_current_profile = []
 
         total_duration = 0.0
 
@@ -108,13 +110,14 @@ class BatterySimulator:
             self.soc_profile.append(soc)
             power = self.battery_pack.power(effective_current)
             self.power_profile.append(power)
+            self.effective_current_profile.append(effective_current)
         
             total_duration += duration
 
         # If the loop broke early, trim the input profiles to the steps actually simulated.
         n = len(self.power_profile)
         self.truncated_duration_profile = duration_profile[:n]
-        self.truncated_current_profile = current_profile[:n]
+        self.truncated_current_profile = self.effective_current_profile[:n]
         self.has_run = True
 
     def summary(
