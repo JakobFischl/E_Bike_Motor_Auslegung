@@ -5,6 +5,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class RouteAnalysis:
+    """
+    Klasse zur  Analyse der GPS-Route. 
+    Liest die daten der csv Datei ein und berechnet Strecke, Geschwindigkeit, Beschleunigung und Steigung.
+    """
     
     def __init__(self, dateipfad):
         try:
@@ -22,6 +26,10 @@ class RouteAnalysis:
             raise
 
     def geschwindigkeit(self):
+        """
+        Berechnet die zurückgelegte Strecke mitttels der Haversine-Formel 
+        sowie Geschwindigkeit in m/s und km/h.
+        """
         logger.info("Berechnung der Geschwindigkeit.")
         try:
             self.daten['delta_t_sekunden'] = self.daten['time'].diff().dt.total_seconds()
@@ -59,6 +67,9 @@ class RouteAnalysis:
             raise
 
     def beschleunigung(self):
+        """
+        Berechnet die Beschleunigung in m/s^2 mithilfe der Geschwindigkeitsdifferenz.
+        """
         logger.info("Berechnung der Beschleunigung.")
         try:
             delta_v = self.daten['geschwindigkeit_m_s'].diff()
@@ -72,6 +83,9 @@ class RouteAnalysis:
             raise
 
     def steigung(self):
+        """
+        Berechnung der Steigung in Prozent sowie dem Steigungswinkel im Bogenmaß.
+        """
         logger.info("Berechnung der Steigung.")
         try:
             delta_h = self.daten['ele'].diff()
@@ -91,6 +105,5 @@ meine_fahrt = RouteAnalysis('simulation_data/final_project_input_data.csv')
 meine_fahrt.geschwindigkeit()
 meine_fahrt.beschleunigung()
 meine_fahrt.steigung()
-
 
 print(meine_fahrt.daten[['time', 'geschwindigkeit_km_h', 'beschleunigung_m_s2', 'steigung_prozent']].head())

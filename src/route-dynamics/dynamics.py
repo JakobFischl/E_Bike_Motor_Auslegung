@@ -6,7 +6,14 @@ from ebike_simulation.motor import Motor
 logger = logging.getLogger(__name__)
 
 class EBikeDynamics:
+    """
+    Klasse zur Berechnung der Kräfte und Motorwerte eines E-Bikes.
+    Baut auf den kinematischen Daten der RouteAnalysis auf.
+    """
     def __init__(self, daten: pd.DataFrame):
+        """
+        Initialisiert die Konstanten für Fahrrad, Fahrer, Umwelt und Motormodell.
+        """
         logger.info("Starte EBikeDynamics.")
         try:
             self.daten = daten
@@ -26,6 +33,9 @@ class EBikeDynamics:
             raise
 
     def kraefte(self):
+        """
+        Berechnung: Luftwiderstand, Hangabtriebskraft, Beschleunigungskraft und  Gesamtkraft.
+        """
         logger.info("Berechnung der Kräfte.")
         try:
         
@@ -52,6 +62,9 @@ class EBikeDynamics:
             raise
     
     def motor_werte(self):
+        """
+        Berechnet das benötigte Drehmoment, den Motorstrom in Ampere und die Leistung in Watt.
+        """
         logger.info("Berechnung von Drehmoment, Strom und Leistung.")
         try:
         
