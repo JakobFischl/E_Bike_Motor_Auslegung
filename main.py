@@ -50,3 +50,16 @@ if __name__ == "__main__":
     plot_hoehenprofil(distance_km, data['ele'].to_numpy())
     plot_geschwindigkeit(time_min, data['geschwindigkeit_km_h'].to_numpy())
     plot_motorleistung(time_min, data['leistung_W'].to_numpy())
+
+    for battery_class in (LiPoBatteryPack, NMCBatteryPack):
+        capacity_Ah = determine_capacity(
+            battery_class,
+            current_profile=current_profile,
+            duration_profile=duration_profile,
+            soc_reserve=soc_reserve
+        )
+        battery = battery_class(capacity_nom_Ah=capacity_Ah, initial_soc=1.0)
+        print(f"{battery.name} pack needs at least {capacity_Ah:.1f} Ah:")
+        simulator = BatterySimulator(battery)
+        simulator.print_summary(current_profile, duration_profile, soc_reserve)
+        simulator.plot_profiles()
