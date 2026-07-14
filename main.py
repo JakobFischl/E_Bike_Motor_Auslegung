@@ -63,3 +63,4 @@ if __name__ == "__main__":
         simulator = BatterySimulator(battery)
         simulator.print_summary(current_profile, duration_profile, soc_reserve)
         simulator.plot_profiles()
+        plt.show()
