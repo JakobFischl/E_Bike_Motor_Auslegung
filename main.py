@@ -64,9 +64,11 @@ if __name__ == "__main__":
     distance_km = np.cumsum(data['delta_s_meter'].to_numpy()) / 1000
     time_min = np.cumsum(data['delta_t_sekunden'].to_numpy()) / 60
 
-    plot_hoehenprofil(distance_km, data['ele'].to_numpy())
-    plot_geschwindigkeit(time_min, data['geschwindigkeit_km_h'].to_numpy())
-    plot_motorleistung(time_min, data['leistung_W'].to_numpy())
+    figures = [
+        (plot_hoehenprofil(distance_km, data['ele'].to_numpy()), "Elevation profile"),
+        (plot_geschwindigkeit(time_min, data['geschwindigkeit_km_h'].to_numpy()), "Speed over time"),
+        (plot_motorleistung(time_min, data['leistung_W'].to_numpy()), "Motor power over time")
+    ]
 
     for battery_class in (LiPoBatteryPack, NMCBatteryPack):
         capacity_Ah = determine_capacity(
@@ -82,5 +84,8 @@ if __name__ == "__main__":
         print(f"{battery.name} pack needs at least {capacity_Ah:.1f} Ah:")
         simulator = BatterySimulator(battery)
         simulator.print_summary(current_profile, duration_profile, parameters.soc_reserve)
-        simulator.plot_profiles()
-        plt.show()
+
+        for figure, caption in simulator.plot_profiles():
+            figures.append((figure, f"{battery.name}: {caption}"))
+
+    plt.show()
