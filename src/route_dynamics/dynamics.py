@@ -40,14 +40,25 @@ class EBikeDynamics:
 
     def kraefte(self):
         """
-        Berechnung: Luftwiderstand, Hangabtriebskraft, Beschleunigungskraft und  Gesamtkraft.
+        Berechnung: Luftwiderstand mit dynamischer Luftdichte, Hangabtriebskraft, Beschleunigungskraft und  Gesamtkraft.
         """
         logger.info("Berechnung der Kräfte.")
         try:
         
             # Luftwiderstand
+
+            h = self.daten['ele']
+            T_kelvin = self.daten['temperature'] + 273.15
+
+            p_0 = 101325.0
+            T_0 = 288.15
+            R_s = 287.058
+
+            p = p_0 * (1 - (0.0065 * h) / T_0)**5.255
+            self.daten['rho'] = p / (R_s * T_kelvin)
+
             v = self.daten['geschwindigkeit_m_s']
-            self.daten['F_luft'] = 0.5 * self.rho * self.cw_A * (v**2)
+            self.daten['F_luft'] = 0.5 * self.daten['rho'] * self.cw_A * (v**2)
         
             # Hangabtriebskraft
             phi = self.daten['steigung_winkel_rad']
@@ -78,7 +89,7 @@ class EBikeDynamics:
         logger.info("Berechnung von Drehmoment, Strom und Leistung.")
         try:
 
-            self.daten['drehmoment_Nm'] = self.daten['F_gesamt'] * self.radius_rad
+            self.daten['drehmoment_Nm'] = self.daten['F_gesamt'] * self.radius_rad_m
             self.daten['motorstrom_A'] = self.motor.get_current_draw(self.daten['drehmoment_Nm'])
             self.daten['leistung_W'] = self.daten['F_gesamt'] * self.daten['geschwindigkeit_m_s']
 
