@@ -183,37 +183,48 @@ class BatterySimulator:
             print("The battery capacity was not sufficient.")
 
 
-    def plot_profiles(self) -> None:
-        """Plot the recorded current, SoC, voltage and power profiles of the last run."""
+    def plot_profiles(self) -> list[tuple]:
+        """
+        Plot the recorded current, SoC, voltage and power profiles of the last run.
+        Returns a list of (figure, caption) pairs, empty when there is nothing to plot.
+        """
 
         # Empty profiles mean either the simulation never ran or it started with empty lists.
         if len(self.truncated_current_profile) == 0:
             if not self.has_run:
                 raise RuntimeError("Lists are empty. Run simulation first.")
             logger.warning("Initial state of charge was 0%.")
-            return
+            return []
 
-        plot_current_profile(
+        current_figure = plot_current_profile(
             current_profile=self.truncated_current_profile,
             duration_profile=self.truncated_duration_profile
         )
-        plot_soc_profile(
+        soc_figure = plot_soc_profile(
             soc_profile=self.soc_profile,
             duration_profile=self.truncated_duration_profile
         )
-        plot_voltage_profile(
+        voltage_figure = plot_voltage_profile(
             voltage_profile=self.voltage_profile,
             duration_profile=self.truncated_duration_profile
         )
-        plot_voltage_and_current_profile(
+        voltage_and_current_figure = plot_voltage_and_current_profile(
             self.voltage_profile,
             self.truncated_current_profile,
             self.truncated_duration_profile
         )
-        plot_power_profile(
+        power_figure = plot_power_profile(
             power_profile=self.power_profile,
             duration_profile=self.truncated_duration_profile
         )
+
+        return [
+            (current_figure, "Current over time"),
+            (soc_figure, "State of charge over time"),
+            (voltage_figure, "Voltage over time"),
+            (voltage_and_current_figure, "Voltage and current over time"),
+            (power_figure, "Power over time")
+        ]
 
 
 if __name__ == "__main__":
