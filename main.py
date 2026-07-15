@@ -10,6 +10,7 @@ from ebike_simulation.battery_simulator import BatterySimulator
 from ebike_simulation.battery_sizer import determine_capacity
 from ebike_simulation.lipo_battery import LiPoBatteryPack
 from ebike_simulation.nmc_battery import NMCBatteryPack
+from ebike_app.parameters import prompt_parameters
 import numpy as np
 import matplotlib.pyplot as plt
 import logging
@@ -32,15 +33,21 @@ if __name__ == "__main__":
         filemode="w"
     )
 
-    file_path = "simulation_data/final_project_input_data.csv"
-    soc_reserve = 0.05
+    parameters = prompt_parameters()
 
-    route = RouteAnalysis(file_path)
+    route = RouteAnalysis(parameters.data_file_path)
     route.geschwindigkeit()
     route.beschleunigung()
     route.steigung()
 
-    dynamics = EBikeDynamics(route.daten)
+    dynamics = EBikeDynamics(
+        route.daten,
+        m_fahrer=parameters.rider_mass_kg,
+        m_fahrrad=parameters.bike_mass_kg,
+        cw_A=parameters.cwA_m2,
+        rad_durchmesser_zoll=parameters.wheel_diameter_inch,
+        motor_konstante=parameters.motor_constant_Nm_A
+    )
     dynamics.kraefte()
     duration_profile, current_profile = dynamics.motor_werte()
 
@@ -66,11 +73,14 @@ if __name__ == "__main__":
             battery_class,
             current_profile=current_profile,
             duration_profile=duration_profile,
-            soc_reserve=soc_reserve
+            soc_reserve=parameters.soc_reserve,
+            initial_soc=parameters.initial_soc,
+            capacity_resolution_Ah=parameters.capacity_resolution_Ah,
+            initial_test_capacity=parameters.initial_test_capacity
         )
-        battery = battery_class(capacity_nom_Ah=capacity_Ah, initial_soc=1.0)
+        battery = battery_class(capacity_nom_Ah=capacity_Ah, initial_soc=parameters.initial_soc)
         print(f"{battery.name} pack needs at least {capacity_Ah:.1f} Ah:")
         simulator = BatterySimulator(battery)
-        simulator.print_summary(current_profile, duration_profile, soc_reserve)
+        simulator.print_summary(current_profile, duration_profile, parameters.soc_reserve)
         simulator.plot_profiles()
         plt.show()
