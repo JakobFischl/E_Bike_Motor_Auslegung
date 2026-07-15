@@ -70,3 +70,12 @@ simulation_data/            Input GPS data
 src/route_dynamics/         GPS route analysis, dynamics, ride metrics, route plots
 src/ebike_simulation/       Battery models, simulator, capacity sizer, plots
 ```
+## Project Architecture
+
+Here are the diagrams illustrating the system structure and the execution flow:
+
+### UML-Class Diagram
+![Class Diagram](diagramms/UML-Classdiagram.png)
+
+### Activity Diagram
+![Activity Diagram](diagramms/Aktivitätsdiagramm.png)
