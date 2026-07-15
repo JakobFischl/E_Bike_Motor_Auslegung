@@ -14,13 +14,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import logging
 
+from pathlib import Path
+
 # Set up local logger
 logger = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
+    output_folder = Path("output")
+    output_folder.mkdir(exist_ok=True)
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s:%(levelname)s:%(name)s:%(message)s",
+        filename=output_folder / "simulation.log",
+        filemode="w"
+    )
 
     file_path = "simulation_data/final_project_input_data.csv"
     soc_reserve = 0.05
