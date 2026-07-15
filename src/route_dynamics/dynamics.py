@@ -10,7 +10,13 @@ class EBikeDynamics:
     Klasse zur Berechnung der Kräfte und Motorwerte eines E-Bikes.
     Baut auf den kinematischen Daten der RouteAnalysis auf.
     """
-    def __init__(self, daten: pd.DataFrame):
+    def __init__(self, daten: pd.DataFrame,
+                 m_fahrer = 70.0,
+                 m_fahrrad = 10.0,
+                 cw_A = 0.5625,
+                 rad_durchmesser_zoll = 27,
+                 motor_konstante = 1.5
+                 ):
         """
         Initialisiert die Konstanten für Fahrrad, Fahrer, Umwelt und Motormodell.
         """
@@ -18,14 +24,14 @@ class EBikeDynamics:
         try:
             self.daten = daten
         
-            self.m_fahrer = 70.0
-            self.m_fahrrad = 10.0
+            self.m_fahrer = m_fahrer
+            self.m_fahrrad = m_fahrrad
             self.m_ges = self.m_fahrer + self.m_fahrrad
             self.g = 9.81
             self.rho = 1.225      
-            self.cw_A = 0.5625 
-            self.radius_rad = (27 * 0.0254) / 2 
-            self.motor = Motor(K_m=1.5)
+            self.cw_A = cw_A
+            self.radius_rad_m = (rad_durchmesser_zoll * 0.0254) / 2 
+            self.motor = Motor(K_m=motor_konstante)
             logger.debug("Konstanten und Motor starten.")
 
         except Exception as e:
