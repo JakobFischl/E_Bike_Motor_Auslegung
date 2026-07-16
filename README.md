@@ -114,7 +114,7 @@ src/ebike_app/              Input parameters and pdf report generation
 
 
 ### UML-Class Diagram
-![Class Diagram](diagramms/UML-Classdiagramm.png)
+![Class Diagram](diagramms/UML_class_diagram.svg)
 
 ### Activity Diagram
-![Activity Diagram](diagramms/Aktivitätsdiagramm.png)
+![Activity Diagram](diagramms/activity_diagram.svg)
