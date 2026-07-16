@@ -11,6 +11,7 @@ from ebike_simulation.battery_sizer import determine_capacity
 from ebike_simulation.lipo_battery import LiPoBatteryPack
 from ebike_simulation.nmc_battery import NMCBatteryPack
 from ebike_app.parameters import prompt_parameters
+from ebike_app.report import build_report
 import numpy as np
 import matplotlib.pyplot as plt
 import logging
@@ -70,6 +71,8 @@ if __name__ == "__main__":
         (plot_motorleistung(time_min, data['leistung_W'].to_numpy()), "Motor power over time")
     ]
 
+    battery_results = []
+
     for battery_class in (LiPoBatteryPack, NMCBatteryPack):
         capacity_Ah = determine_capacity(
             battery_class,
@@ -83,9 +86,14 @@ if __name__ == "__main__":
         battery = battery_class(capacity_nom_Ah=capacity_Ah, initial_soc=parameters.initial_soc)
         print(f"{battery.name} pack needs at least {capacity_Ah:.1f} Ah:")
         simulator = BatterySimulator(battery)
-        simulator.print_summary(current_profile, duration_profile, parameters.soc_reserve)
+        result = simulator.summary(current_profile, duration_profile, parameters.soc_reserve)
+        simulator.print_result(result)
+        battery_results.append((battery.name, capacity_Ah, result))
 
         for figure, caption in simulator.plot_profiles():
             figures.append((figure, f"{battery.name}: {caption}"))
+
+    report_path = build_report(parameters, metrics, battery_results, figures, output_folder)
+    print(f"\nThe report was written to '{report_path}'.")
 
     plt.show()
