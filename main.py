@@ -1,6 +1,6 @@
 from route_dynamics.route import RouteAnalysis
 from route_dynamics.dynamics import EBikeDynamics
-from route_dynamics.ride_metrics import compute_ride_metrics, print_ride_metrics
+from route_dynamics.ride_metrics import compute_ride_metrics
 from route_dynamics.route_plotting import (
     plot_hoehenprofil,
     plot_geschwindigkeit,
@@ -13,7 +13,6 @@ from ebike_simulation.nmc_battery import NMCBatteryPack
 from ebike_app.parameters import prompt_parameters
 from ebike_app.report import build_report
 import numpy as np
-import matplotlib.pyplot as plt
 import logging
 
 from pathlib import Path
@@ -60,7 +59,6 @@ if __name__ == "__main__":
         data['ele'].to_numpy(),
         data['leistung_W'].to_numpy()
     )
-    print_ride_metrics(metrics)
 
     distance_km = np.cumsum(data['delta_s_meter'].to_numpy()) / 1000
     time_min = np.cumsum(data['delta_t_sekunden'].to_numpy()) / 60
@@ -84,16 +82,12 @@ if __name__ == "__main__":
             initial_test_capacity=parameters.initial_test_capacity
         )
         battery = battery_class(capacity_nom_Ah=capacity_Ah, initial_soc=parameters.initial_soc)
-        print(f"{battery.name} pack needs at least {capacity_Ah:.1f} Ah:")
         simulator = BatterySimulator(battery)
         result = simulator.summary(current_profile, duration_profile, parameters.soc_reserve)
-        simulator.print_result(result)
         battery_results.append((battery.name, capacity_Ah, result))
 
         for figure, caption in simulator.plot_profiles():
             figures.append((figure, f"{battery.name}: {caption}"))
 
     report_path = build_report(parameters, metrics, battery_results, figures, output_folder)
-    print(f"\nThe report was written to '{report_path}'.")
-
-    plt.show()
+    print(f"The result is visible in a pdf report that was written to '{report_path}'.")

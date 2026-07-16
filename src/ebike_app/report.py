@@ -4,6 +4,8 @@ import shutil
 import subprocess
 import logging
 
+import matplotlib.pyplot as plt
+
 from string import Template
 from pathlib import Path
 from datetime import datetime
@@ -26,6 +28,9 @@ LATEX_SPECIAL_CHARACTERS = {
 }
 
 
+REPORT_FIGURE_SIZE_INCH = (10.0, 6.0)
+
+
 class LatexTemplate(Template):
     """Template that marks placeholders with @ because LaTeX already uses $ for math mode."""
     delimiter = "@"
@@ -35,11 +40,10 @@ REPORT_TEMPLATE = LatexTemplate(r"""\documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
-\usepackage[margin=2.5cm,landscape]{geometry}
+\usepackage[margin=2cm,landscape]{geometry}
 
 \title{E-Bike Motor Auslegung \\ Ride Report}
 \date{@DATE}
-\author{Jakob Fischl, Jan Horsthemke}
 
 \begin{document}
 \maketitle
@@ -156,7 +160,9 @@ def save_figures(figures: list[tuple], figures_folder: Path) -> list[tuple]:
 
     for number, (figure, caption) in enumerate(figures, start=1):
         file_name = f"figure{number:02d}.pdf"
+        figure.set_size_inches(*REPORT_FIGURE_SIZE_INCH)
         figure.savefig(figures_folder / file_name, bbox_inches="tight")
+        plt.close(figure)
         saved.append((file_name, caption))
 
     logger.debug(f"Saved {len(saved)} figures to '{figures_folder}'.")
@@ -170,7 +176,7 @@ def format_figure_pages(saved_figures: list[tuple]) -> str:
         pages.append(
             f"\\section*{{{escape_latex(caption)}}}\n"
             f"\\centering"
-            f"\\includegraphics[width=\\textwidth,height=0.8\\textheight,keepaspectratio]{{figures/{file_name}}}\n"
+            f"\\includegraphics[width=\\textwidth,height=0.9\\textheight,keepaspectratio]{{figures/{file_name}}}\n"
             "\\clearpage"
         )
     return "\n".join(pages)
