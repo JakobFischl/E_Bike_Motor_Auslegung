@@ -28,7 +28,6 @@ class EBikeDynamics:
             self.m_fahrrad = m_fahrrad
             self.m_ges = self.m_fahrer + self.m_fahrrad
             self.g = 9.81
-            self.rho = 1.225      
             self.cw_A = cw_A
             self.radius_rad_m = (rad_durchmesser_zoll * 0.0254) / 2 
             self.motor = Motor(K_m=motor_konstante)
