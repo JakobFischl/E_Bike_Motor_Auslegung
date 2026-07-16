@@ -55,8 +55,9 @@ From the project root, run:
 python main.py
 ```
 
-**Important:** the program must be started from the project root, because it uses
-the relative paths `simulation_data/final_project_input_data.csv` and `output/`.
+**Important:** 
+The program must be started from the project root, because it uses the relative paths
+`simulation_data/final_project_input_data.csv` and `output/`.
 
 The program then asks for the parameters of the ride in the terminal. Every question
 shows its default value in brackets, so simply pressing enter accepts the default and
@@ -118,3 +119,91 @@ src/ebike_app/              Input parameters and pdf report generation
 
 ### Activity Diagram
 ![Activity Diagram](diagramms/activity_diagram.svg)
+
+## Team
+
+- Jakob Fischl: battery simulation and capacity sizing, ride metrics, parameter input,
+  pdf report generation, `main.py`
+- Jan Horsthemke: route analysis, driving dynamics and route plots
+
+## Implemented extensions
+
+The project also implements:
+
+- **Dynamic air density:** 
+  Instead of a constant density of 1.225 kg/m^3 the air density is computed for every
+  GPS point from its elevation and the measured temperature with the barometric formula,
+  so the temperature column of the input data is actually used.
+- **GPS noise filtering:** 
+  GPS points that are less than a configurable time apart are merged and a rolling
+  median is applied to the speed. Without this the derived acceleration explodes and
+  the peak power reaches an unrealistic 9.7 kW.
+- **Terminal parameter input:** 
+  All ride parameters are entered in the terminal with sensible defaults, so the user
+  never has to touch the code.
+- **Pdf report:** 
+  The results are automatically collected in a LaTeX document that is compiled to `output/report.pdf`.
+- **Logging:** 
+  Every step of the program writes log messages to `output/simulation.log`.
+- **Conventional Commits:** 
+  The commit messages follow the Conventional Commits specification.
+
+## Sources
+
+### Course materials
+
+- [Abschlussprojekt](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/15_abschlussprojekt/1_abschlussprojekt.html):
+  the task, the bike parameters and the OCV-SoC characteristics of both battery chemistries
+- [OOP](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/09_oop/2_oop_uebung.html),
+  [Vererbung](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/09_oop/3_vererbung.html),
+  [Anwendung der OOP](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/09_oop/4_anwendung_oop.html) and
+  [OOP-Übungen 2](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/09_oop/5_oop_uebung_2.html):
+  the battery pack, motor and simulator classes the project builds on
+- [Numpy](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/10_scientific_computing/1_numpy_intro.html),
+  [Matplotlib](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/10_scientific_computing/2_matplotlib_intro.html),
+  [Exceptions & Tests](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/11_exceptions_tests/1_exceptions_test.html) and
+  [Pathlib, Logging, Datetime, OS](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/12_standard_pakete/1_pathlib_datetime_os.html)
+- [Algorithmik & Diagramme](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/08_algorithmik_diagramme/1_algorithmik_diagramme.html):
+  activity diagrams
+- [Git basics](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/14_versionierung_git/1_git_basic.html) and
+  [collaboration with Git and GitHub](https://mrp123.github.io/MCI-MECH-B-2-PRO1-PRO1-ILV/lectures/14_versionierung_git/2_git_colab.html)
+
+### Data
+
+- The GPS ride data in `simulation_data/final_project_input_data.csv` was provided
+  with the assignment.
+
+### Algorithms and background
+
+- [Clamp (function) - Wikipedia](https://en.wikipedia.org/wiki/Clamp_(function)):
+  clamping the state of charge to [0, 1]
+- [Binary search - W3Schools](https://www.w3schools.com/Python/python_dsa_binarysearch.asp):
+  finding the smallest sufficient battery capacity
+- [Lineare Interpolation - Studyflix](https://studyflix.de/mathematik/lineare-interpolation-3767):
+  interpolating the OCV-SoC characteristic
+
+### Libraries and documentation
+
+- [scipy.interpolate.PchipInterpolator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.PchipInterpolator.html):
+  monotonic interpolation of the OCV-SoC characteristic
+- [numpy.cumsum](https://numpy.org/doc/stable/reference/generated/numpy.cumsum.html),
+  [numpy.less](https://numpy.org/doc/stable/reference/generated/numpy.less.html) and
+  [numpy.concatenate](https://numpy.org/doc/stable/reference/generated/numpy.concatenate.html)
+- [matplotlib.pyplot.stairs](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.stairs.html) and
+  [axis ticks](https://matplotlib.org/stable/users/explain/axes/axes_ticks.html)
+- [dataclasses](https://docs.python.org/3/library/dataclasses.html),
+  [typing.NamedTuple](https://typing.python.org/en/latest/spec/namedtuples.html) and
+  [logging](https://docs.python.org/3/library/logging.html) from the Python standard library
+- [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/):
+  `pyproject.toml` and `pip install -e .`
+
+### Tools and conventions
+
+- [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)
+- [draw.io](https://www.drawio.com/): UML class diagram and activity diagram
+- [Real Python - Creating Great README Files](https://realpython.com/readme-python-project/)
+
+### AI assistance
+
+- Claude (Anthropic) and Google Gemini were used for code review, explanations and
+  debugging support.
