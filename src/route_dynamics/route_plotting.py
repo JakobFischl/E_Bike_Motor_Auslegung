@@ -14,9 +14,8 @@ def plot_hoehenprofil(distanz_km: np.ndarray, elevation: np.ndarray):
     
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(distanz_km, elevation, color='forestgreen', linewidth=2)
-    ax.set_title('Höhenprofil der Strecke')
-    ax.set_xlabel('Zurückgelegte Distanz (km)')
-    ax.set_ylabel('Höhe über Meeresspiegel (m)')
+    ax.set_xlabel('Distance Traveled (km)')
+    ax.set_ylabel('Height Above Sea Level (m)')
     ax.grid(True, linestyle='--', alpha=0.7)
     
     ax.fill_between(distanz_km, elevation, np.min(elevation) - 10, color='forestgreen', alpha=0.2)
@@ -32,9 +31,8 @@ def plot_geschwindigkeit(zeit: np.ndarray, geschwindigkeit_kmh: np.ndarray):
     
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(zeit, geschwindigkeit_kmh, color='royalblue', linewidth=1.5)
-    ax.set_title('Geschwindigkeit über die Zeit')
-    ax.set_xlabel('Zeit')
-    ax.set_ylabel('Geschwindigkeit (km/h)')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Speed (km/h)')
     ax.grid(True, linestyle='--', alpha=0.7)
     
     logger.debug("Geschwindigkeits Plot generiert.")
@@ -48,9 +46,8 @@ def plot_motorleistung(zeit: np.ndarray, leistung_w: np.ndarray):
     
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(zeit, leistung_w, color='crimson', linewidth=1.5)
-    ax.set_title('Benötigte Motorleistung über die Zeit')
-    ax.set_xlabel('Zeit')
-    ax.set_ylabel('Leistung (W)')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Power (W)')
     ax.grid(True, linestyle='--', alpha=0.7)
     
     logger.debug("Leistungs Plot generiert.")
