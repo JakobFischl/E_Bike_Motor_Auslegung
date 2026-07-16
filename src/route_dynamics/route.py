@@ -10,12 +10,12 @@ class RouteAnalysis:
     Liest die daten der csv Datei ein und berechnet Strecke, Geschwindigkeit, Beschleunigung und Steigung.
     """
     
-    def __init__(self, dateipfad):
+    def __init__(self, dateipfad, min_dt_sekunden: float = 1.0):
         try:
             logger.info(f"Daten von '{dateipfad}'laden.")
             self.daten = pd.read_csv(dateipfad, sep=';')
             self.daten['time'] = pd.to_datetime(self.daten['time'])
-            self.dichte_punkte_zusammenfassen()
+            self.dichte_punkte_zusammenfassen(min_dt_sekunden)
             logger.info("Daten geladen")
 
         except FileNotFoundError:

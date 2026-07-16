@@ -14,19 +14,17 @@ class RideParameters:
     Class to keep track of all input parameters
     to make interaction with the user easier.
     """
-    rider_mass_kg: float | int = 70
-    bike_mass_kg: float | int = 10
+    rider_mass_kg: float = 70.0
+    bike_mass_kg: float = 10.0
     cwA_m2: float = 0.5625 # c_w * A
-    wheel_diameter_inch: int = 27
-    motor_constant_Nm_A: float | int = 1.5 # N * m / A
+    wheel_diameter_inch: float = 27.0
+    motor_constant_Nm_A: float = 1.5 # N * m / A
     soc_reserve: float = 0.05
-    initial_soc: float | int = 1
+    initial_soc: float = 1.0
     data_file_path: str = "simulation_data/final_project_input_data.csv"
-    gravity_acceleration_m_s2: float = 9.81 # m / s^2
-    min_dt_sekunden: float | int = 1
+    min_dt_seconds: float = 1.0
     capacity_resolution_Ah: float = 0.1
     initial_test_capacity: float = 0.01
-    earth_radius_m: int = 6371000
 
 
 def ask_float(

@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     parameters = prompt_parameters()
 
-    route = RouteAnalysis(parameters.data_file_path)
+    route = RouteAnalysis(parameters.data_file_path, min_dt_sekunden=parameters.min_dt_seconds)
     route.geschwindigkeit()
     route.beschleunigung()
     route.steigung()
