@@ -172,6 +172,10 @@ class BatterySimulator:
     ) -> None:
         """Run the simulation and print a summary (SoC in %, energy in Wh, charge in Ah)."""
         result = self.summary(current_profile, duration_profile, soc_reserve)
+        self.print_result(result)
+
+    def print_result(self, result: SummaryResult) -> None:
+        """Print an already calculated summary result (SoC in %, energy in Wh, charge in Ah)."""
         print(f"The final SoC was {result.final_soc * 100:.2f} %.")
         print(f"The lowest SoC was {result.min_soc * 100:.2f} %.")
         print(f"The peak power draw was {result.max_power:.2f} W")
